@@ -10,9 +10,9 @@
   <!-- أيقونات Bootstrap -->
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
 
-  <!-- خطوط Google Fonts (Inter + Cairo + Patrick Hand) -->
+  <!-- خطوط Google Fonts (Inter + Cairo + Patrick Hand + Edu TAS Beginner) -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&family=Cairo:wght@400;600&family=Patrick+Hand&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&family=Cairo:wght@400;600&family=Patrick+Hand&family=Edu+TAS+Beginner:wght@400;700&display=swap" rel="stylesheet">
 
   <!-- مكتبة Marked.js لتحويل Markdown إلى HTML -->
   <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
@@ -204,6 +204,7 @@
     <select id="font-select" class="form-select" onchange="changeFont()">
       <option value="default" selected>الخط الطبيعي</option>
       <option value="patrick">Patrick Hand</option>
+      <option value="edu">Edu TAS Beginner</option>
     </select>
   </div>
 
@@ -323,6 +324,10 @@
       currentFont = "'Patrick Hand', 'Inter', 'Cairo', sans-serif";
       document.body.style.fontFamily = "'Patrick Hand', cursive";
       document.getElementById('logo-text').style.fontFamily = "'Patrick Hand', cursive";
+    } else if (sel === 'edu') {
+      currentFont = "'Edu TAS Beginner', 'Inter', 'Cairo', sans-serif";
+      document.body.style.fontFamily = "'Edu TAS Beginner', cursive";
+      document.getElementById('logo-text').style.fontFamily = "'Edu TAS Beginner', cursive";
     } else {
       currentFont = "'Inter', 'Cairo', sans-serif";
       document.body.style.fontFamily = currentFont;
@@ -555,7 +560,7 @@
           <title>طباعة النتيجة</title>
           <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.rtl.min.css" rel="stylesheet" crossorigin="anonymous">
           <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
-          <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&family=Cairo:wght@400;600&family=Patrick+Hand&display=swap" rel="stylesheet">
+          <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&family=Cairo:wght@400;600&family=Patrick+Hand&family=Edu+TAS+Beginner:wght@400;700&display=swap" rel="stylesheet">
           <style>${styleContent}</style>
         </head>
         <body>
