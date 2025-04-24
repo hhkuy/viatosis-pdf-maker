@@ -1,35 +1,33 @@
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta charset="UTF-8">
   <title>محول الماركداون إلى HTML</title>
 
-  <!-- Bootstrap 5 RTL -->
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.rtl.min.css" rel="stylesheet" crossorigin="anonymous" />
-  <!-- Bootstrap Icons -->
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" />
-  <!-- Google Fonts -->
-  <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&family=Cairo:wght@400;600&family=Patrick+Hand&display=swap" rel="stylesheet" />
-  <!-- Marked.js -->
+  <!-- استيراد Bootstrap 5 -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.rtl.min.css" rel="stylesheet" crossorigin="anonymous">
+
+  <!-- أيقونات Bootstrap -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
+
+  <!-- خطوط Google Fonts (Inter + Cairo + Patrick Hand) -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&family=Cairo:wght@400;600&family=Patrick+Hand&display=swap" rel="stylesheet">
+
+  <!-- مكتبة Marked.js لتحويل Markdown إلى HTML -->
   <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
 
   <style>
-    /* =====================  أساسيات عامة  ===================== */
-    *, *::before, *::after { box-sizing: border-box; }
+    /* الخط الأساسي */
     body {
       font-family: 'Inter', 'Cairo', sans-serif;
       background: linear-gradient(135deg, #faf3e7, #eef7f6);
-      margin: 0; padding: 0;
+      margin: 0;
+      padding: 0;
       color: #2c3e50;
-      font-weight: 400;                 /* يمنع iOS من توليد Bold تلقائي */
-      font-synthesis: none;             /* يمنع توليد أنماط خط صناعية على iOS */
-      -webkit-font-smoothing: antialiased; /* يجعل الخط أقل سمكاً بطباعة iOS */
-      -moz-osx-font-smoothing: grayscale;
     }
 
-    /* =====================  الحاوية الرئيسية  ===================== */
+    /* حاوية الصفحة الرئيسية */
     .container {
       margin-top: 50px;
       max-width: 1000px;
@@ -39,20 +37,32 @@
       box-shadow: 0 10px 30px rgba(0,0,0,0.1);
     }
 
-    /* العناوين */
-    h1 { text-align: center; margin-bottom: 30px; color: #2e4053; font-weight: 600; }
-    label { font-weight: 600; color: #555; }
+    /* عنوان الصفحة */
+    h1 {
+      text-align: center;
+      margin-bottom: 30px;
+      color: #2e4053;
+      font-weight: 600;
+    }
 
-    /* أزرار مخصصة */
+    label {
+      font-weight: 600;
+      color: #555;
+    }
+
+    /* تنسيق خاص للأزرار */
     .btn-custom {
       border-radius: 50px;
       padding: 12px 20px;
       font-size: 1.1em;
-      transition: transform 0.3s ease, box-shadow 0.3s ease;
+      transition: all 0.3s ease;
     }
-    .btn-custom:hover { transform: translateY(-3px); box-shadow: 0 5px 15px rgba(0, 123, 255, 0.2); }
+    .btn-custom:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 5px 15px rgba(0, 123, 255, 0.2);
+    }
 
-    /* حقل الماركداون */
+    /* حقل النص ثابت الحجم وكبير */
     textarea {
       border-radius: 15px;
       overflow-y: auto;
@@ -60,7 +70,7 @@
       height: 500px;
     }
 
-    /* منطقة النتيجة */
+    /* منطقة عرض النتيجة */
     #result {
       margin-top: 30px;
       background-color: #fff;
@@ -72,14 +82,14 @@
       position: relative;
     }
 
-    /* ألوان العناوين داخل النتيجة */
+    /* تنسيقات داخل النتيجة */
     #result h1 { color: #2e4053; }
     #result h2 { color: #2874a6; }
     #result h3 { color: #148f77; }
     #result h4 { color: #9b59b6; }
     #result h5, #result h6 { color: #b03a2e; }
-    #result p, #result li, #result td, #result th { color: #2c3e50; font-weight: 400; }
-    #result strong { color: #6c3483; font-weight: 700; }
+    #result p, #result li, #result td, #result th { color: #2c3e50; }
+    #result strong { color: #6c3483; font-weight: bold; }
     #result em { color: #d35400; font-style: italic; }
     #result pre,
     #result code {
@@ -88,59 +98,85 @@
       border-radius: 4px;
       color: #34495e;
     }
-    #result table { width: 100%; border-collapse: collapse; margin: 20px 0; }
-    #result table th, #result table td { border: 1px solid #ccc; padding: 10px; text-align: left; }
+    #result table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 20px 0;
+    }
+    #result table th, #result table td {
+      border: 1px solid #ccc;
+      padding: 10px;
+      text-align: left;
+    }
     #result table thead { background-color: #f2f2f2; }
 
-    /* =====================  أزرار عائمة  ===================== */
+    @media print {
+      body { -webkit-print-color-adjust: exact; }
+    }
+
+    /* الأزرار العائمة */
     .floating-buttons {
       position: fixed;
       top: 50%;
       right: 10px;
       transform: translateY(-50%);
-      display: flex; flex-direction: column; gap: 10px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
       z-index: 9999;
     }
 
-    /* =====================  العلامة المائية والشعار  ===================== */
-    #watermark,
-    #watermark-image-container {
-      position: fixed; top: 0; left: 0;
-      width: 100%; height: 100%;
+    /* العلامة المائية النصية */
+    #watermark {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
       display: none;
-      pointer-events: none;
       z-index: -1;
+      pointer-events: none;
+      text-align: center;
     }
+
+    /* العلامة المائية الصورية */
+    #watermark-image-container {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      display: none;
+      z-index: -2;
+      pointer-events: none;
+    }
+
+    /* الشعار */
     #logo-container {
       position: absolute;
-      top: 20px; left: 50%;
+      top: 20px;
+      left: 50%;
       transform: translateX(-50%);
       text-align: center;
       display: none;
       z-index: 999;
     }
-    #logo-container img { width: 150px; height: auto; border: 2px solid #ccc; border-radius: 8px; }
-    #logo-text { margin-top: 8px; font-weight: 600; font-family: 'Inter', 'Cairo', sans-serif; }
-
-    /* =====================  تحسينات للطباعة  ===================== */
-    @media print {
-      html, body {
-        background: #fff !important;
-        -webkit-print-color-adjust: exact !important;
-        print-color-adjust: exact !important;
-        -webkit-font-smoothing: antialiased !important;
-        font-synthesis: none !important;
-      }
-      #watermark, #watermark-image-container { position: fixed; }
-      img { max-width: 100% !important; height: auto !important; }
-      /* منع قص العناصر الثابتة في صفحات متعددة */
-      #printHeader, #printWatermarkText, #printWatermarkImage { page-break-inside: avoid; }
+    #logo-container img {
+      width: 150px;
+      height: auto;
+      border: 2px solid #ccc;
+      border-radius: 8px;
+    }
+    #logo-text {
+      margin-top: 8px;
+      font-weight: 600;
+      font-family: 'Inter', 'Cairo', sans-serif;
     }
   </style>
 </head>
 <body>
 
-<!-- ==============  الأزرار العائمة  ============== -->
+<!-- أزرار عائمة -->
 <div class="floating-buttons">
   <button class="btn btn-success btn-custom" onclick="convertMarkdown()" title="تحويل الماركداون">
     <i class="bi bi-arrow-left-right"></i>
@@ -153,7 +189,6 @@
   </button>
 </div>
 
-<!-- ==============  الحاوية الداخلية  ============== -->
 <div class="container">
   <h1><i class="bi bi-file-earmark-code-fill"></i> محول الماركداون إلى HTML</h1>
 
@@ -177,101 +212,104 @@
     <label for="watermark-text" class="form-label">العلامة المائية (نص):</label>
     <input type="text" id="watermark-text" class="form-control" placeholder="اكتب العلامة المائية..." oninput="updateWatermark()" />
   </div>
-  <div class="mb-3 row g-2">
-    <div class="col-md-6">
-      <label for="watermark-size" class="form-label">حجم العلامة (px):</label>
-      <input type="number" id="watermark-size" class="form-control" placeholder="الحجم..." oninput="updateWatermark()" />
-    </div>
-    <div class="col-md-6">
-      <label for="watermark-count" class="form-label">عدد العلامات:</label>
-      <input type="number" id="watermark-count" class="form-control" placeholder="العدد..." oninput="updateWatermark()" />
-    </div>
+  <div class="mb-3">
+    <label for="watermark-size" class="form-label">حجم العلامة المائية النصية (px):</label>
+    <input type="number" id="watermark-size" class="form-control" placeholder="اكتب الحجم..." oninput="updateWatermark()" />
+  </div>
+  <div class="mb-3">
+    <label for="watermark-count" class="form-label">عدد العلامات المائية النصية:</label>
+    <input type="number" id="watermark-count" class="form-control" placeholder="اكتب عدد العلامات..." oninput="updateWatermark()" />
   </div>
   <div class="mb-3 form-check">
-    <input type="checkbox" class="form-check-input" id="enable-watermark" onchange="updateWatermark()" />
+    <input type="checkbox" class="form-check-input" id="enable-watermark" onchange="updateWatermark()">
     <label class="form-check-label" for="enable-watermark">تفعيل العلامة المائية النصية</label>
   </div>
 
   <!-- العلامة المائية الصورية -->
   <div class="mb-3 form-check">
-    <input type="checkbox" class="form-check-input" id="enable-image-watermark" onchange="updateWatermark()" />
-    <label class="form-check-label" for="enable-image-watermark">تفعيل العلامة المائية بالصور</label>
+    <input type="checkbox" class="form-check-input" id="enable-image-watermark" onchange="updateWatermark()">
+    <label class="form-check-label" for="enable-image-watermark">تفعيل العلامة المائية بالصور (ثابتة)</label>
   </div>
-  <div class="mb-3 row g-2">
-    <div class="col-md-6">
-      <label for="watermark-image-size" class="form-label">حجم الصورة (px):</label>
-      <input type="number" id="watermark-image-size" class="form-control" placeholder="العرض..." oninput="updateWatermark()" />
-    </div>
-    <div class="col-md-6">
-      <label for="watermark-image-count" class="form-label">عدد التكرار:</label>
-      <input type="number" id="watermark-image-count" class="form-control" placeholder="العدد..." oninput="updateWatermark()" />
-    </div>
+  <div class="mb-3">
+    <label for="watermark-image-size" class="form-label">حجم الصورة المائية (px):</label>
+    <input type="number" id="watermark-image-size" class="form-control" placeholder="اكتب العرض المطلوب..." oninput="updateWatermark()" />
+  </div>
+  <div class="mb-3">
+    <label for="watermark-image-count" class="form-label">عدد مرات تكرار الصورة المائية:</label>
+    <input type="number" id="watermark-image-count" class="form-control" placeholder="عدد المرات..." oninput="updateWatermark()" />
   </div>
 
   <!-- الشعار -->
   <div class="mb-3 form-check">
-    <input type="checkbox" class="form-check-input" id="enable-logo" onchange="updateWatermark()" />
+    <input type="checkbox" class="form-check-input" id="enable-logo" onchange="updateWatermark()">
     <label class="form-check-label" for="enable-logo">إضافة الصورة كشعار</label>
   </div>
-  <div class="mb-3 row g-2">
-    <div class="col-md-6">
-      <label for="logo-size" class="form-label">حجم الشعار (px):</label>
-      <input type="number" id="logo-size" class="form-control" placeholder="الحجم..." oninput="updateWatermark()" />
-    </div>
-    <div class="col-md-6">
-      <label for="logo-position" class="form-label">موقع الشعار:</label>
-      <select id="logo-position" class="form-select" onchange="updateWatermark()">
-        <option value="top-center" selected>منتصف أعلى الصفحة</option>
-        <option value="top-right">أعلى اليمين</option>
-        <option value="top-left">أعلى اليسار</option>
-        <option value="bottom-right">أسفل اليمين</option>
-        <option value="bottom-left">أسفل اليسار</option>
-      </select>
-    </div>
+  <div class="mb-3">
+    <label for="logo-size" class="form-label">حجم الشعار (px):</label>
+    <input type="number" id="logo-size" class="form-control" placeholder="اكتب الحجم..." oninput="updateWatermark()" />
   </div>
-  <div class="mb-3 row g-2">
-    <div class="col-md-6">
-      <label for="doctor-name" class="form-label">نص تحت الشعار:</label>
-      <input type="text" id="doctor-name" class="form-control" placeholder="اسم الدكتور..." oninput="updateWatermark()" />
+  <div class="mb-3">
+    <label for="logo-position" class="form-label">موقع الشعار:</label>
+    <select id="logo-position" class="form-select" onchange="updateWatermark()">
+      <option value="top-center" selected>منتصف أعلى الصفحة (مرة واحدة)</option>
+      <option value="top-right">أعلى اليمين</option>
+      <option value="top-left">أعلى اليسار</option>
+      <option value="bottom-right">أسفل اليمين</option>
+      <option value="bottom-left">أسفل اليسار</option>
+    </select>
+  </div>
+  <div class="mb-3">
+    <label for="doctor-name" class="form-label">نص تحت الشعار (اسم الدكتور):</label>
+    <input type="text" id="doctor-name" class="form-control" placeholder="اسم الدكتور..." oninput="updateWatermark()" />
+  </div>
+  <div class="mb-3">
+    <label for="doctor-size" class="form-label">حجم نص اسم الدكتور (px):</label>
+    <input type="number" id="doctor-size" class="form-control" placeholder="حجم النص..." oninput="updateWatermark()" />
+  </div>
+
+  <!-- أزرار التحكم -->
+  <div class="row g-2">
+    <div class="col-md-4">
+      <button class="btn btn-info w-100 btn-custom text-white" onclick="copyResult()">
+        <i class="bi bi-files"></i> نسخ النتيجة (HTML)
+      </button>
     </div>
-    <div class="col-md-6">
-      <label for="doctor-size" class="form-label">حجم النص (px):</label>
-      <input type="number" id="doctor-size" class="form-control" placeholder="الحجم..." oninput="updateWatermark()" />
+    <div class="col-md-4">
+      <button class="btn btn-danger w-100 btn-custom" onclick="deleteResult()">
+        <i class="bi bi-trash"></i> حذف النتيجة
+      </button>
+    </div>
+    <div class="col-md-4">
+      <button class="btn btn-primary w-100 btn-custom" onclick="convertMarkdown()">
+        <i class="bi bi-arrow-left-right"></i> تحويل
+      </button>
     </div>
   </div>
 
-  <!-- أزرار التحكم بالنتيجة -->
-  <div class="row g-2">
-    <div class="col-md-4">
-      <button class="btn btn-info w-100 btn-custom text-white" onclick="copyResult()"><i class="bi bi-files"></i> نسخ النتيجة</button>
-    </div>
-    <div class="col-md-4">
-      <button class="btn btn-danger w-100 btn-custom" onclick="deleteResult()"><i class="bi bi-trash"></i> حذف</button>
-    </div>
-    <div class="col-md-4">
-      <button class="btn btn-primary w-100 btn-custom" onclick="convertMarkdown()"><i class="bi bi-arrow-left-right"></i> تحويل</button>
-    </div>
-  </div>
   <!-- زر نسخ كود النتيجة -->
   <div class="row g-2 mt-2">
     <div class="col-md-12">
-      <button class="btn btn-secondary w-100 btn-custom" onclick="copyResultCode()"><i class="bi bi-clipboard"></i> نسخ كود النتيجة</button>
+      <button class="btn btn-secondary w-100 btn-custom" onclick="copyResultCode()">
+        <i class="bi bi-clipboard"></i> نسخ كود النتيجة
+      </button>
     </div>
   </div>
 
-  <!-- النتيجة -->
+  <!-- المنطقة النهائية للنتيجة -->
   <div id="result" style="direction: rtl;"></div>
 </div>
 
-<!-- عناصر العلامة المائية والشعار -->
+<!-- العلامة المائية النصية -->
 <div id="watermark"></div>
+<!-- العلامة المائية الصورية -->
 <div id="watermark-image-container"></div>
+<!-- الشعار -->
 <div id="logo-container">
   <img id="logo-image" src="" alt="الشعار" />
   <div id="logo-text"></div>
 </div>
 
-<!-- Bootstrap JS Bundle -->
+<!-- Bootstrap JS -->
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js" crossorigin="anonymous"></script>
 
 <script>
@@ -279,13 +317,12 @@
   let currentDirection = 'rtl';
   let currentFont = "'Inter', 'Cairo', sans-serif";
 
-  // تغيير نوع الخط
   function changeFont() {
     const sel = document.getElementById('font-select').value;
     if (sel === 'patrick') {
       currentFont = "'Patrick Hand', 'Inter', 'Cairo', sans-serif";
-      document.body.style.fontFamily = currentFont;
-      document.getElementById('logo-text').style.fontFamily = currentFont;
+      document.body.style.fontFamily = "'Patrick Hand', cursive";
+      document.getElementById('logo-text').style.fontFamily = "'Patrick Hand', cursive";
     } else {
       currentFont = "'Inter', 'Cairo', sans-serif";
       document.body.style.fontFamily = currentFont;
@@ -293,7 +330,6 @@
     }
   }
 
-  // تحديد اتجاه أول حرف
   function detectFirstCharDirection(text) {
     const trimmed = text.trim();
     if (!trimmed) return 'rtl';
@@ -303,7 +339,6 @@
     return /[\u0600-\u06FF]/.test(trimmed[i]) ? 'rtl' : 'ltr';
   }
 
-  // تحويل الماركداون إلى HTML
   function convertMarkdown() {
     const markdownText = document.getElementById('markdown-input').value;
     const rawHTML = marked.parse(markdownText);
@@ -317,24 +352,32 @@
     document.getElementById('result').innerHTML = doc.body.innerHTML;
   }
 
-  // نسخ كود النتيجة
   function copyResultCode() {
     const codeText = document.getElementById('result').outerHTML;
-    navigator.clipboard.writeText(codeText).then(() => alert('تم نسخ كود النتيجة!'));
+    const temp = document.createElement('textarea');
+    temp.value = codeText;
+    document.body.appendChild(temp);
+    temp.select();
+    document.execCommand('copy');
+    document.body.removeChild(temp);
+    alert("تم نسخ كود النتيجة بنجاح!");
   }
 
-  // نسخ النتيجة كـ HTML
   function copyResult() {
     const html = document.getElementById('result').innerHTML;
-    navigator.clipboard.writeText(html).then(() => alert('تم نسخ النتيجة!'));
+    const temp = document.createElement('textarea');
+    temp.value = html;
+    document.body.appendChild(temp);
+    temp.select();
+    document.execCommand('copy');
+    document.body.removeChild(temp);
+    alert("تم نسخ النتيجة (HTML) بنجاح!");
   }
 
-  // حذف النتيجة
-  function deleteResult() { document.getElementById('result').innerHTML = ''; }
+  function deleteResult() { document.getElementById('result').innerHTML = ""; }
 
-  // تحديث العلامة المائية والشعار
   function updateWatermark() {
-    /* ===== نصية ===== */
+    // نصية
     const wmText = document.getElementById('watermark-text').value;
     const wmSize = parseInt(document.getElementById('watermark-size').value) || 50;
     const wmCount = parseInt(document.getElementById('watermark-count').value) || 1;
@@ -359,7 +402,7 @@
       wmDiv.style.display = 'none';
     }
 
-    /* ===== صورية ===== */
+    // صورية
     const enableImgWM = document.getElementById('enable-image-watermark').checked;
     const wmImgSize = parseInt(document.getElementById('watermark-image-size').value) || 200;
     const wmImgCount = parseInt(document.getElementById('watermark-image-count').value) || 1;
@@ -383,7 +426,7 @@
       wmImgContainer.style.display = 'none';
     }
 
-    /* ===== الشعار ===== */
+    // الشعار
     const enableLogo = document.getElementById('enable-logo').checked;
     const logoSize = parseInt(document.getElementById('logo-size').value) || 150;
     const logoPos = document.getElementById('logo-position').value;
@@ -397,11 +440,12 @@
       logoContainer.style.display = 'block';
       logoImage.src = fixedImagePath;
       logoImage.style.width = logoSize + 'px';
+
       logoText.textContent = doctorName;
       logoText.style.fontSize = doctorSize + 'px';
       logoText.style.display = doctorName.trim() ? 'block' : 'none';
 
-      // إعادة الضبط
+      // Reset position
       logoContainer.style.top = '';
       logoContainer.style.bottom = '';
       logoContainer.style.left = '';
@@ -437,17 +481,18 @@
     }
   }
 
-  // طباعة المحتوى
   function printResult() {
     const content = document.getElementById('result').innerHTML;
     const pw = window.open('about:blank', '_blank', 'width=800,height=600');
     const langAttr = (currentDirection === 'rtl') ? 'ar' : 'en';
 
-    // بيانات العلامة المائية
+    // بيانات العلامة المائية النصية
     const wmText = document.getElementById('watermark-text').value;
     const wmSize = parseInt(document.getElementById('watermark-size').value) || 50;
     const wmCount = parseInt(document.getElementById('watermark-count').value) || 1;
     const enableText = document.getElementById('enable-watermark').checked;
+
+    // بيانات العلامة المائية الصورية
     const enableImgWM = document.getElementById('enable-image-watermark').checked;
     const wmImgSize = parseInt(document.getElementById('watermark-image-size').value) || 200;
     const wmImgCount = parseInt(document.getElementById('watermark-image-count').value) || 1;
@@ -459,31 +504,27 @@
     const doctorSize = parseInt(document.getElementById('doctor-size').value) || 20;
 
     const styleContent = `
-      @media print {
-        body { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; -webkit-font-smoothing: antialiased !important; font-synthesis: none !important; background:#fff !important; }
-        img { max-width: 100% !important; height: auto !important; }
-      }
-      body { font-family: ${currentFont}; margin:0; padding:0; color:#2c3e50; font-weight:400; }
+      @media print { body { -webkit-print-color-adjust: exact; } }
+      body { font-family: ${currentFont}; background:#fff; margin:0; padding:0; color:#2c3e50; }
       #printHeader { text-align:center; margin-top:20px; }
       #printHeader img { width:${logoSize}px; height:auto; border:2px solid #ccc; border-radius:8px; }
       #printHeader div { margin-top:8px; font-size:${doctorSize}px; font-weight:600; }
-      #printResult { padding:20px; direction:${currentDirection}; }
+      #printResult { padding:20px; }
       #printResult h1 { color:#2e4053; }
       #printResult h2 { color:#2874a6; }
       #printResult h3 { color:#148f77; }
       #printResult h4 { color:#9b59b6; }
-      #printResult h5, #printResult h6 { color:#b03a2e; }
-      #printResult p, #printResult li, #printResult td, #printResult th { color:#2c3e50; font-weight:400; }
+      #printResult h5,#printResult h6 { color:#b03a2e; }
+      #printResult p,#printResult li,#printResult td,#printResult th { color:#2c3e50; }
       #printResult strong { color:#6c3483; }
       #printResult em { color:#d35400; }
-      #printResult pre, #printResult code { background:#e8f0fe; padding:4px 8px; border-radius:4px; color:#34495e; }
+      #printResult pre,#printResult code { background:#e8f0fe; padding:4px 8px; border-radius:4px; color:#34495e; }
       #printResult table { width:100%; border-collapse:collapse; margin:20px 0; }
-      #printResult table th, #printResult table td { border:1px solid #ccc; padding:10px; text-align:left; }
+      #printResult table th,#printResult table td { border:1px solid #ccc; padding:10px; text-align:left; }
       #printResult table thead { background:#f2f2f2; }
-      #printWatermarkText, #printWatermarkImage { position:fixed; top:0; left:0; width:100%; height:100%; display:flex; flex-wrap:wrap; justify-content:center; align-items:center; pointer-events:none; z-index:-1; }
+      #printWatermarkText,#printWatermarkImage { position:fixed; top:0; left:0; width:100%; height:100%; display:flex; flex-wrap:wrap; justify-content:center; align-items:center; pointer-events:none; z-index:-1; }
     `;
 
-    // إجزاء العلامة المائية
     let wmTextHTML = '';
     if (enableText && wmText.trim()) {
       let spans = '';
@@ -492,6 +533,7 @@
       }
       wmTextHTML = `<div id="printWatermarkText">${spans}</div>`;
     }
+
     let wmImgHTML = '';
     if (enableImgWM) {
       let imgs = '';
@@ -501,7 +543,6 @@
       wmImgHTML = `<div id="printWatermarkImage">${imgs}</div>`;
     }
 
-    // الشعار
     let headerHTML = '';
     if (enableLogo) {
       headerHTML = `<div id="printHeader"><img src="${fixedImagePath}" alt="logo"/><div>${doctorName}</div></div>`;
@@ -512,16 +553,16 @@
         <head>
           <meta charset="UTF-8" />
           <title>طباعة النتيجة</title>
-          <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.rtl.min.css" rel="stylesheet" crossorigin="anonymous" />
-          <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" />
-          <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&family=Cairo:wght@400;600&family=Patrick+Hand&display=swap" rel="stylesheet" />
+          <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.rtl.min.css" rel="stylesheet" crossorigin="anonymous">
+          <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
+          <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&family=Cairo:wght@400;600&family=Patrick+Hand&display=swap" rel="stylesheet">
           <style>${styleContent}</style>
         </head>
         <body>
           ${headerHTML}
           ${wmTextHTML}
           ${wmImgHTML}
-          <div id="printResult">${content}</div>
+          <div id="printResult" style="direction:${currentDirection};">${content}</div>
           <script>window.onload = function(){window.print();};<\/script>
         </body>
       </html>
@@ -529,7 +570,6 @@
     pw.document.close();
   }
 
-  // زر أعلى/أسفل
   function toggleScroll() {
     const cur = window.scrollY;
     const max = document.body.scrollHeight - window.innerHeight;
@@ -543,5 +583,6 @@
     }
   }
 </script>
+
 </body>
 </html>
