@@ -120,7 +120,7 @@
 
     @media print {
       body { -webkit-print-color-adjust: exact; }
-      #result img { max-width: 180mm; height: auto; } /* ملائمة للطباعة على A4/A3 */
+      #result img { max-width: 180mm; height: auto; }
     }
 
     /* الأزرار العائمة */
@@ -181,6 +181,11 @@
       font-weight: 600;
       font-family: 'Inter', 'Cairo', sans-serif;
     }
+
+    /* معرض الصور */
+    .selectable {cursor:pointer;border:2px solid transparent;border-radius:8px;}
+    .selectable:hover {border-color:#0d6efd;}
+    .selected {border-color:#198754;}
   </style>
 </head>
 <body>
@@ -356,6 +361,9 @@
       <button class="btn btn-success w-100 btn-custom" onclick="handleUpload()">رفع الصورة</button>
     </div>
     <div class="mb-3">
+      <button class="btn btn-secondary w-100 btn-custom" onclick="loadGallery()">إظهار المعرض</button>
+    </div>
+    <div class="mb-3">
       <label class="form-label">رابط الصورة (raw):</label>
       <input type="text" id="image-url" class="form-control" readonly>
     </div>
@@ -363,6 +371,8 @@
       <button class="btn btn-primary w-100 btn-custom" id="insert-btn" onclick="insertImage()" disabled>Insert في الماركداون</button>
     </div>
     <div id="upload-status" class="text-center"></div>
+    <hr>
+    <div id="gallery" class="mt-3"></div>
   </div>
 </div>
 
@@ -445,6 +455,7 @@
 
   function deleteResult() { document.getElementById('result').innerHTML = ""; }
 
+  /* ============   جزء العلامة المائية والشعار (كما هو)  ============ */
   function updateWatermark() {
     // نصية
     const wmText = document.getElementById('watermark-text').value;
@@ -549,6 +560,7 @@
       logoImage.src = '';
     }
   }
+  /* ================================================================ */
 
   function printResult() {
     const content = document.getElementById('result').innerHTML;
@@ -652,11 +664,28 @@
       window.scrollTo({ top: 0, behavior: 'smooth' });
     }
   }
-</script>
 
-<!-- سكربت الإضافة الجديدة لتحميل وإدراج الصور -->
-<script>
-  // رفع الصورة إلى GitHub
+  /* ============ تحميل الصور و معالجتها ============ */
+
+  // جلب قائمة الصور لحساب الرقم التالي
+  function getNextImageNumber(callback) {
+    fetch('https://api.github.com/repos/hhkuy/viatosis-pdf-maker/contents/pic')
+      .then(res => res.json())
+      .then(data => {
+        let max = 0;
+        data.forEach(item => {
+          const m = item.name.match(/^(\d+)\./);
+          if (m) {
+            const num = parseInt(m[1]);
+            if (num > max) max = num;
+          }
+        });
+        callback(max + 1);
+      })
+      .catch(() => callback(Date.now())); // في حال فشل الجلب
+  }
+
+  // رفع الصورة إلى GitHub مع إعادة تسمية رقمية
   function handleUpload() {
     const token = document.getElementById('github-token').value.trim();
     const fileInput = document.getElementById('image-file');
@@ -672,47 +701,86 @@
       return;
     }
 
-    const reader = new FileReader();
-    reader.onloadend = () => {
-      const base64Data = reader.result.split(',')[1];
-      const apiUrl = `https://api.github.com/repos/hhkuy/viatosis-pdf-maker/contents/pic/${file.name}`;
+    getNextImageNumber(nextNum => {
+      const ext = file.name.split('.').pop();
+      const newFileName = `${nextNum}.${ext}`;
 
-      fetch(apiUrl, {
-        method: 'PUT',
-        headers: {
-          'Authorization': `token ${token}`,
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({
-          message: `Add ${file.name}`,
-          content: base64Data,
-          branch: 'main'
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        const base64Data = reader.result.split(',')[1];
+        const apiUrl = `https://api.github.com/repos/hhkuy/viatosis-pdf-maker/contents/pic/${newFileName}`;
+
+        fetch(apiUrl, {
+          method: 'PUT',
+          headers: {
+            'Authorization': `token ${token}`,
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({
+            message: `Add ${newFileName}`,
+            content: base64Data,
+            branch: 'main'
+          })
         })
-      })
-      .then(res => res.json())
-      .then(data => {
-        if (data.content && data.content.path) {
-          const rawUrl = `https://raw.githubusercontent.com/hhkuy/viatosis-pdf-maker/main/pic/${file.name}`;
-          document.getElementById('image-url').value = rawUrl;
-          document.getElementById('insert-btn').disabled = false;
-          status.innerHTML = '<span class="text-success">تم الرفع بنجاح!</span>';
-        } else if (data.message && data.message.includes('already exists')) {
-          const rawUrl = `https://raw.githubusercontent.com/hhkuy/viatosis-pdf-maker/main/pic/${file.name}`;
-          document.getElementById('image-url').value = rawUrl;
-          document.getElementById('insert-btn').disabled = false;
-          status.innerHTML = '<span class="text-warning">الملف موجود مسبقاً، تم استخدام الرابط الموجود.</span>';
-        } else {
-          status.innerHTML = '<span class="text-danger">حدث خطأ أثناء الرفع.</span>';
-        }
-      })
-      .catch(() => {
-        status.innerHTML = '<span class="text-danger">فشل الرفع.</span>';
-      });
-    };
-    reader.readAsDataURL(file);
+        .then(res => res.json())
+        .then(data => {
+          if (data.content && data.content.path) {
+            const rawUrl = `https://raw.githubusercontent.com/hhkuy/viatosis-pdf-maker/main/pic/${newFileName}`;
+            document.getElementById('image-url').value = rawUrl;
+            document.getElementById('insert-btn').disabled = false;
+            status.innerHTML = '<span class="text-success">تم الرفع بنجاح!</span>';
+            loadGallery(); // تحديث المعرض مباشرة
+          } else {
+            status.innerHTML = '<span class="text-danger">حدث خطأ أثناء الرفع.</span>';
+          }
+        })
+        .catch(() => {
+          status.innerHTML = '<span class="text-danger">فشل الرفع.</span>';
+        });
+      };
+      reader.readAsDataURL(file);
+    });
   }
 
-  // إدراج رابط الصورة مكان مؤشر الكتابة في الماركداون
+  // تحميل وعرض المعرض
+  function loadGallery() {
+    const gallery = document.getElementById('gallery');
+    gallery.innerHTML = '<p class="text-center text-muted">...جاري التحميل</p>';
+
+    fetch('https://api.github.com/repos/hhkuy/viatosis-pdf-maker/contents/pic')
+      .then(res => res.json())
+      .then(data => {
+        let html = '<div class="row">';
+        data.forEach(item => {
+          if (item.type === 'file') {
+            const rawUrl = `https://raw.githubusercontent.com/hhkuy/viatosis-pdf-maker/main/pic/${item.name}`;
+            const nameNoExt = item.name.split('.')[0];
+            html += `
+              <div class="col-6 col-md-4 mb-3 text-center">
+                <img src="${rawUrl}" alt="${nameNoExt}" class="img-fluid selectable" onclick="selectExistingImage(this,'${rawUrl}','${nameNoExt}')">
+                <div class="mt-1"><small>${nameNoExt}</small></div>
+              </div>
+            `;
+          }
+        });
+        html += '</div>';
+        gallery.innerHTML = html;
+      })
+      .catch(() => {
+        gallery.innerHTML = '<p class="text-danger text-center">تعذر تحميل المعرض.</p>';
+      });
+  }
+
+  // تحديد صورة من المعرض
+  function selectExistingImage(imgElem, url, alt) {
+    document.querySelectorAll('.selectable').forEach(el => el.classList.remove('selected'));
+    imgElem.classList.add('selected');
+    document.getElementById('image-url').value = url;
+    document.getElementById('image-alt').value = alt;
+    document.getElementById('insert-btn').disabled = false;
+  }
+
+  // إدراج رابط الصورة في الماركداون
   function insertImage() {
     const url = document.getElementById('image-url').value.trim();
     const alt = document.getElementById('image-alt').value.trim() || '';
