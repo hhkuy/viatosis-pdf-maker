@@ -82,7 +82,7 @@
     /* ضبط الصور + الحفاظ على الدقة */
     #result img {
       display: block;
-      margin: 0 auto;
+      margin: 0 auto 10px;
       box-shadow: 0 2px 8px rgba(0,0,0,0.15);
       border: 2px solid #eee;
       border-radius: 8px;
@@ -92,7 +92,7 @@
       image-rendering: auto;
     }
 
-    /* شبكة الصور باستخدام Flex لضمان بقاءها فعليًا جنبًا إلى جنب */
+    /* شبكة الصور باستخدام Flex لضمان ترتيب صحيح عند A4/A3 */
     .img-grid{
       display:flex;
       flex-wrap:wrap;
@@ -100,9 +100,9 @@
       justify-content:center;
       page-break-inside: avoid;
     }
-    .img-grid.cols-1 img{flex:0 0 100%;max-width:100%;}
-    .img-grid.cols-2 img{flex:0 0 calc(50% - 10px);max-width:calc(50% - 10px);}
-    .img-grid.cols-3 img{flex:0 0 calc(33.333% - 10px);max-width:calc(33.333% - 10px);}
+    .img-grid.cols-1 img{flex:0 0 100%;max-width:100%}
+    .img-grid.cols-2 img{flex:0 0 calc(45% - 10px);max-width:calc(45% - 10px)}
+    .img-grid.cols-3 img{flex:0 0 calc(28% - 10px);max-width:calc(28% - 10px)}
 
     /* تنسيقات داخل النتيجة */
     #result h1 { color: #2e4053; }
@@ -140,13 +140,13 @@
         border: 2px solid #eee;
         border-radius: 8px;
         height: auto;
-        max-width: 180mm;
+        max-width: 170mm;
         object-fit: contain;
       }
-      .img-grid{display:flex;flex-wrap:wrap;gap:10px;justify-content:center;}
-      .img-grid.cols-1 img{max-width:180mm;}
-      .img-grid.cols-2 img{max-width:calc(90mm - 10px);}
-      .img-grid.cols-3 img{max-width:calc(60mm - 10px);}
+      .img-grid{display:flex;flex-wrap:wrap;gap:10px;justify-content:center}
+      .img-grid.cols-1 img{max-width:170mm}
+      .img-grid.cols-2 img{max-width:calc(82mm - 10px)}
+      .img-grid.cols-3 img{max-width:calc(53mm - 10px)}
     }
 
     /* الأزرار العائمة */
@@ -215,25 +215,13 @@
   </style>
 </head>
 <body>
-<!-- بقية المحتوى والسكربتات بدون تغيير -->
-<!-- …  كل ما يلي مطابق تمامًا لأحدث نسخة أرسلتَها ـ دون أي حذف أو نقص  … -->
 
 <!-- أزرار عائمة -->
 <div class="floating-buttons">
-  <!-- زر إضافة الصورة الجديد -->
-  <button class="btn btn-warning btn-custom" data-bs-toggle="offcanvas" data-bs-target="#imagePanel" title="إضافة صورة">
-    <i class="bi bi-image"></i>
-  </button>
-
-  <button class="btn btn-success btn-custom" onclick="convertMarkdown()" title="تحويل الماركداون">
-    <i class="bi bi-arrow-left-right"></i>
-  </button>
-  <button class="btn btn-dark btn-custom" onclick="printResult()" title="طباعة / PDF">
-    <i class="bi bi-printer-fill"></i>
-  </button>
-  <button class="btn btn-info btn-custom text-white" onclick="toggleScroll()" title="أعلى/أسفل">
-    <i class="bi bi-arrow-up-down"></i>
-  </button>
+  <button class="btn btn-warning btn-custom" data-bs-toggle="offcanvas" data-bs-target="#imagePanel" title="إضافة صورة"><i class="bi bi-image"></i></button>
+  <button class="btn btn-success btn-custom" onclick="convertMarkdown()" title="تحويل"><i class="bi bi-arrow-left-right"></i></button>
+  <button class="btn btn-dark btn-custom" onclick="printResult()" title="طباعة / PDF"><i class="bi bi-printer-fill"></i></button>
+  <button class="btn btn-info btn-custom text-white" onclick="toggleScroll()" title="أعلى/أسفل"><i class="bi bi-arrow-up-down"></i></button>
 </div>
 
 <div class="container">
@@ -327,28 +315,20 @@
   <!-- أزرار التحكم -->
   <div class="row g-2">
     <div class="col-md-4">
-      <button class="btn btn-info w-100 btn-custom text-white" onclick="copyResult()">
-        <i class="bi bi-files"></i> نسخ النتيجة (HTML)
-      </button>
+      <button class="btn btn-info w-100 btn-custom text-white" onclick="copyResult()"><i class="bi bi-files"></i> نسخ النتيجة (HTML)</button>
     </div>
     <div class="col-md-4">
-      <button class="btn btn-danger w-100 btn-custom" onclick="deleteResult()">
-        <i class="bi bi-trash"></i> حذف النتيجة
-      </button>
+      <button class="btn btn-danger w-100 btn-custom" onclick="deleteResult()"><i class="bi bi-trash"></i> حذف النتيجة</button>
     </div>
     <div class="col-md-4">
-      <button class="btn btn-primary w-100 btn-custom" onclick="convertMarkdown()">
-        <i class="bi bi-arrow-left-right"></i> تحويل
-      </button>
+      <button class="btn btn-primary w-100 btn-custom" onclick="convertMarkdown()"><i class="bi bi-arrow-left-right"></i> تحويل</button>
     </div>
   </div>
 
   <!-- زر نسخ كود النتيجة -->
   <div class="row g-2 mt-2">
     <div class="col-md-12">
-      <button class="btn btn-secondary w-100 btn-custom" onclick="copyResultCode()">
-        <i class="bi bi-clipboard"></i> نسخ كود النتيجة
-      </button>
+      <button class="btn btn-secondary w-100 btn-custom" onclick="copyResultCode()"><i class="bi bi-clipboard"></i> نسخ كود النتيجة</button>
     </div>
   </div>
 
@@ -493,7 +473,7 @@
 
   function deleteResult() { document.getElementById('result').innerHTML = ""; }
 
-  /* ============   جزء العلامة المائية والشعار (كما هو)  ============ */
+  /* ============   جزء العلامة المائية والشعار  ============ */
   function updateWatermark() {
     // نصية
     const wmText = document.getElementById('watermark-text').value;
@@ -629,21 +609,11 @@
       #printHeader img { width:${logoSize}px; height:auto; border:2px solid #ccc; border-radius:8px; }
       #printHeader div { margin-top:8px; font-size:${doctorSize}px; font-weight:600; }
       #printResult { padding:20px; }
-      #printResult h1 { color:#2e4053; }
-      #printResult h2 { color:#2874a6; }
-      #printResult h3 { color:#148f77; }
-      #printResult h4 { color:#9b59b6; }
-      #printResult h5,#printResult h6 { color:#b03a2e; }
-      #printResult p,#printResult li,#printResult td,#printResult th { color:#2c3e50; }
-      #printResult strong { color:#6c3483; }
-      #printResult em { color:#d35400; }
-      #printResult pre,#printResult code { background:#e8f0fe; padding:4px 8px; border-radius:4px; color:#34495e; }
-      #printResult table { width:100%; border-collapse:collapse; margin:20px 0; }
-      #printResult table th,#printResult table td { border:1px solid #ccc; padding:10px; text-align:left; }
-      #printResult table thead { background:#f2f2f2; }
-      #printResult img { max-width:180mm; height:auto; display:block; margin:10px auto; box-shadow:0 2px 8px rgba(0,0,0,0.15); border:2px solid #eee; border-radius:8px; object-fit:contain; }
+      #printResult img { max-width:170mm; height:auto; display:block; margin:10px auto; box-shadow:0 2px 8px rgba(0,0,0,0.15); border:2px solid #eee; border-radius:8px; object-fit:contain; }
       .img-grid {display:flex;flex-wrap:wrap;gap:10px;justify-content:center;}
-      .img-grid.cols-2 img{max-width:calc(90mm - 10px);} .img-grid.cols-3 img{max-width:calc(60mm - 10px);}  
+      .img-grid.cols-1 img{max-width:170mm;} 
+      .img-grid.cols-2 img{max-width:calc(82mm - 10px);} 
+      .img-grid.cols-3 img{max-width:calc(53mm - 10px);} 
       #printWatermarkText,#printWatermarkImage { position:fixed; top:0; left:0; width:100%; height:100%; display:flex; flex-wrap:wrap; justify-content:center; align-items:center; pointer-events:none; z-index:-1; }
     `;
 
@@ -705,11 +675,11 @@
     }
   }
 
-  /* ============ تحميل الصور و معالجتها ============ */
+  /* ============ تحميل الصور إلى GitHub ============ */
 
   let selectedImages = [];
 
-  // جلب قائمة الصور لحساب الرقم التالي
+  // جلب أكبر رقم للصور
   function getNextImageNumber(callback) {
     fetch('https://api.github.com/repos/hhkuy/viatosis-pdf-maker/contents/pic')
       .then(res => res.json())
@@ -724,40 +694,26 @@
         });
         callback(max + 1);
       })
-      .catch(() => callback(Date.now())); // في حال فشل الجلب
+      .catch(() => callback(Date.now()));
   }
 
-  // رفع عدة صور إلى GitHub
+  // رفع مجموعة صور
   function handleUpload() {
     const token = document.getElementById('github-token').value.trim();
     const fileInput = document.getElementById('image-file');
     const files = Array.from(fileInput.files);
     const status = document.getElementById('upload-status');
 
-    if (!token) {
-      status.innerHTML = '<span class="text-danger">الرجاء إدخال التوكن.</span>';
-      return;
-    }
-    if (files.length === 0) {
-      status.innerHTML = '<span class="text-danger">الرجاء اختيار ملفات الصور.</span>';
-      return;
-    }
+    if (!token) { status.innerHTML = '<span class="text-danger">الرجاء إدخال التوكن.</span>'; return; }
+    if (files.length === 0) { status.innerHTML = '<span class="text-danger">اختر ملفات صور.</span>'; return; }
 
     status.innerHTML = '<span class="text-info">جاري الرفع...</span>';
-    let uploaded = 0;
-    let startNumber = null;
+    let uploaded = 0, startNumber = null;
 
-    getNextImageNumber(num => {
-      startNumber = num;
-      uploadNext();
-    });
+    getNextImageNumber(num => { startNumber = num; uploadNext(); });
 
     function uploadNext() {
-      if (uploaded >= files.length) {
-        status.innerHTML = '<span class="text-success">تم الرفع!</span>';
-        loadGallery();
-        return;
-      }
+      if (uploaded >= files.length){ status.innerHTML = '<span class="text-success">تم الرفع!</span>'; loadGallery(); return; }
       const file = files[uploaded];
       const ext = file.name.split('.').pop();
       const newFileName = `${startNumber + uploaded}.${ext}`;
@@ -765,110 +721,80 @@
       reader.onloadend = () => {
         const base64Data = reader.result.split(',')[1];
         const apiUrl = `https://api.github.com/repos/hhkuy/viatosis-pdf-maker/contents/pic/${newFileName}`;
-        fetch(apiUrl, {
-          method: 'PUT',
-          headers: {
-            'Authorization': `token ${token}`,
-            'Content-Type': 'application/json'
-          },
-          body: JSON.stringify({
-            message: `Add ${newFileName}`,
-            content: base64Data,
-            branch: 'main'
-          })
+        fetch(apiUrl,{
+          method:'PUT',
+          headers:{'Authorization':`token ${token}`,'Content-Type':'application/json'},
+          body:JSON.stringify({message:`Add ${newFileName}`,content:base64Data,branch:'main'})
         })
-        .then(res => res.json())
-        .then(data => {
-          if (data.content && data.content.path) {
+        .then(res=>res.json())
+        .then(data=>{
+          if(data.content&&data.content.path){
             const rawUrl = `https://raw.githubusercontent.com/hhkuy/viatosis-pdf-maker/main/pic/${newFileName}`;
             const altText = document.getElementById('image-alt').value.trim() || newFileName.split('.')[0];
-            selectedImages.push({url: rawUrl, alt: altText});
-            uploaded++;
-            uploadNext();
-          } else {
-            status.innerHTML = '<span class="text-danger">حدث خطأ أثناء الرفع.</span>';
-          }
+            selectedImages.push({url:rawUrl,alt:altText});
+            uploaded++; uploadNext();
+          } else { status.innerHTML='<span class="text-danger">خطأ أثناء الرفع.</span>'; }
         })
-        .catch(() => { status.innerHTML = '<span class="text-danger">فشل الرفع.</span>'; });
+        .catch(()=>{ status.innerHTML='<span class="text-danger">فشل الرفع.</span>'; });
       };
       reader.readAsDataURL(file);
     }
   }
 
-  // تحميل وعرض المعرض
+  // معرض الصور
   function loadGallery() {
     const gallery = document.getElementById('gallery');
     gallery.innerHTML = '<p class="text-center text-muted">...جاري التحميل</p>';
 
     fetch('https://api.github.com/repos/hhkuy/viatosis-pdf-maker/contents/pic')
-      .then(res => res.json())
-      .then(data => {
-        let html = '<div class="row">';
-        data.forEach(item => {
-          if (item.type === 'file') {
-            const rawUrl = `https://raw.githubusercontent.com/hhkuy/viatosis-pdf-maker/main/pic/${item.name}`;
-            const nameNoExt = item.name.split('.')[0];
-            html += `
+      .then(res=>res.json())
+      .then(data=>{
+        let html='<div class="row">';
+        data.forEach(item=>{
+          if(item.type==='file'){
+            const rawUrl=`https://raw.githubusercontent.com/hhkuy/viatosis-pdf-maker/main/pic/${item.name}`;
+            const nameNoExt=item.name.split('.')[0];
+            html+=`
               <div class="col-6 col-md-4 mb-3 text-center">
                 <img src="${rawUrl}" alt="${nameNoExt}" class="img-fluid selectable" onclick="selectExistingImage(this,'${rawUrl}','${nameNoExt}')">
                 <div class="mt-1"><small>${nameNoExt}</small></div>
-              </div>
-            `;
+              </div>`;
           }
         });
-        html += '</div>';
-        gallery.innerHTML = html;
+        html+='</div>'; gallery.innerHTML=html;
       })
-      .catch(() => {
-        gallery.innerHTML = '<p class="text-danger text-center">تعذر تحميل المعرض.</p>';
-      });
+      .catch(()=>{ gallery.innerHTML='<p class="text-danger text-center">تعذر تحميل المعرض.</p>'; });
   }
 
-  // تحديد صورة/إلغاء تحديد من المعرض
-  function selectExistingImage(imgElem, url, alt) {
+  function selectExistingImage(imgElem,url,alt){
     imgElem.classList.toggle('selected');
-    if (imgElem.classList.contains('selected')) {
-      selectedImages.push({url, alt});
-    } else {
-      selectedImages = selectedImages.filter(i => i.url !== url);
-    }
-    document.getElementById('insert-btn').disabled = (selectedImages.length === 0);
-    document.getElementById('image-url').value = selectedImages.map(i => i.url).join('\n');
+    if(imgElem.classList.contains('selected')){ selectedImages.push({url,alt}); }
+    else{ selectedImages = selectedImages.filter(i=>i.url!==url); }
+    document.getElementById('insert-btn').disabled = (selectedImages.length===0);
+    document.getElementById('image-url').value = selectedImages.map(i=>i.url).join('\n');
   }
 
-  // إدراج روابط الصور في الماركداون وفق التخطيط المختار
-  function insertImage() {
-    if (selectedImages.length === 0) return;
-    const layout = parseInt(document.getElementById('layout-select').value, 10); // 1,2,3
+  // إدراج الصور في المحرر
+  function insertImage(){
+    if(selectedImages.length===0) return;
+    const layout=parseInt(document.getElementById('layout-select').value,10);
+    let htmlSnippet=`<div class="img-grid cols-${layout}">`;
+    selectedImages.forEach(img=>{ htmlSnippet+=`<img src="${img.url}" alt="${img.alt}">`; });
+    htmlSnippet+='</div>';
 
-    // تكوين HTML
-    let htmlSnippet = `<div class="img-grid cols-${layout}">`;
-    selectedImages.forEach(img => {
-      htmlSnippet += `<img src="${img.url}" alt="${img.alt}">`;
-    });
-    htmlSnippet += '</div>';
-
-    const textarea = document.getElementById('markdown-input');
-    const start = textarea.selectionStart;
-    const end = textarea.selectionEnd;
-
-    textarea.value = textarea.value.slice(0, start) + htmlSnippet + textarea.value.slice(end);
+    const textarea=document.getElementById('markdown-input');
+    const start=textarea.selectionStart,end=textarea.selectionEnd;
+    textarea.value = textarea.value.slice(0,start)+htmlSnippet+textarea.value.slice(end);
     textarea.focus();
-    textarea.selectionStart = textarea.selectionEnd = start + htmlSnippet.length;
+    textarea.selectionStart = textarea.selectionEnd = start+htmlSnippet.length;
 
-    // إعادة تعيين
-    selectedImages = [];
-    document.getElementById('insert-btn').disabled = true;
-    document.getElementById('upload-status').innerHTML = '';
-    document.getElementById('image-file').value = '';
-    document.getElementById('image-url').value = '';
+    selectedImages=[]; document.getElementById('insert-btn').disabled=true;
+    document.getElementById('upload-status').innerHTML=''; document.getElementById('image-file').value='';
+    document.getElementById('image-url').value=''; document.querySelectorAll('.selectable').forEach(el=>el.classList.remove('selected'));
 
-    document.querySelectorAll('.selectable').forEach(el => el.classList.remove('selected'));
-
-    // إغلاق اللوحة الجانبية بعد الإدراج
-    const offcanvasElement = document.getElementById('imagePanel');
-    const offcanvasInstance = bootstrap.Offcanvas.getInstance(offcanvasElement);
-    if (offcanvasInstance) offcanvasInstance.hide();
+    const offcanvasElement=document.getElementById('imagePanel');
+    const offcanvasInstance=bootstrap.Offcanvas.getInstance(offcanvasElement);
+    if(offcanvasInstance) offcanvasInstance.hide();
   }
 </script>
 
