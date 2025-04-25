@@ -79,7 +79,7 @@
       position: relative;
     }
 
-    /* ضبط الصور لتتلاءم مع الصفحة + ظل وإطار خفيف */
+    /* ضبط الصور لتتلاءم مع الصفحة + ظل وإطار خفيف + المحافظة على الدقة */
     #result img {
       display: block;
       margin: 10px auto;
@@ -88,9 +88,11 @@
       border-radius: 8px;
       height: auto;
       max-width: 100%;
+      object-fit: contain;          /* عدم تشويه الصورة */
+      image-rendering: auto;        /* الحفاظ على الجودة */
     }
 
-    /* تنسيق الشبكة للصور المُدرجة مع تحجيم تلقائي يناسب A4/A3 */
+    /* تنسيق الشبكة للصور المُدرجة مع تحجيم تلقائي يناسب A4/A3 بدون تشويه */
     .img-grid {
       display: flex;
       flex-wrap: wrap;
@@ -99,18 +101,15 @@
       page-break-inside: avoid;
     }
     .img-grid.cols-1 img{
-      flex: 0 0 100%;
-      width: 100%;
+      flex: 1 1 100%;
       max-width: 100%;
     }
     .img-grid.cols-2 img{
-      flex: 0 0 calc(50% - 10px);
-      width: calc(50% - 10px);
+      flex: 1 1 calc(50% - 10px);
       max-width: calc(50% - 10px);
     }
     .img-grid.cols-3 img{
-      flex: 0 0 calc(33.333% - 10px);
-      width: calc(33.333% - 10px);
+      flex: 1 1 calc(33.333% - 10px);
       max-width: calc(33.333% - 10px);
     }
 
@@ -145,11 +144,18 @@
     @media print {
       @page { size: A4 portrait; margin: 15mm; }
       body { -webkit-print-color-adjust: exact; }
-      #result img { box-shadow: 0 2px 8px rgba(0,0,0,0.15); border: 2px solid #eee; border-radius: 8px; }
+      #result img {
+        box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+        border: 2px solid #eee;
+        border-radius: 8px;
+        height: auto;
+        max-width: 180mm;         /* ضمان التناسب مع ورقة A4 */
+        object-fit: contain;
+      }
       .img-grid { page-break-inside: avoid; }
-      .img-grid.cols-1 img{ width:100%; max-width:100%; }
-      .img-grid.cols-2 img{ width:calc(50% - 10px); max-width:calc(50% - 10px); }
-      .img-grid.cols-3 img{ width:calc(33.333% - 10px); max-width:calc(33.333% - 10px); }
+      .img-grid.cols-1 img{ max-width: 180mm; }
+      .img-grid.cols-2 img{ max-width: calc(90mm - 10px); }
+      .img-grid.cols-3 img{ max-width: calc(60mm - 10px); }
     }
 
     /* الأزرار العائمة */
@@ -642,9 +648,9 @@
       #printResult table { width:100%; border-collapse:collapse; margin:20px 0; }
       #printResult table th,#printResult table td { border:1px solid #ccc; padding:10px; text-align:left; }
       #printResult table thead { background:#f2f2f2; }
-      #printResult img { max-width:180mm; height:auto; display:block; margin:10px auto; box-shadow:0 2px 8px rgba(0,0,0,0.15); border:2px solid #eee; border-radius:8px; }
+      #printResult img { max-width:180mm; height:auto; display:block; margin:10px auto; box-shadow:0 2px 8px rgba(0,0,0,0.15); border:2px solid #eee; border-radius:8px; object-fit:contain; }
       .img-grid {display:flex;flex-wrap:wrap;gap:10px;justify-content:center;}
-      .img-grid.cols-2 img{max-width:calc(50% - 10px);} .img-grid.cols-3 img{max-width:calc(33.333% - 10px);}  
+      .img-grid.cols-2 img{max-width:calc(90mm - 10px);} .img-grid.cols-3 img{max-width:calc(60mm - 10px);}  
       #printWatermarkText,#printWatermarkImage { position:fixed; top:0; left:0; width:100%; height:100%; display:flex; flex-wrap:wrap; justify-content:center; align-items:center; pointer-events:none; z-index:-1; }
     `;
 
