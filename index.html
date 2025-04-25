@@ -178,6 +178,11 @@
 
 <!-- أزرار عائمة -->
 <div class="floating-buttons">
+  <!-- زر إضافة الصورة الجديد -->
+  <button class="btn btn-warning btn-custom" data-bs-toggle="offcanvas" data-bs-target="#imagePanel" title="إضافة صورة">
+    <i class="bi bi-image"></i>
+  </button>
+
   <button class="btn btn-success btn-custom" onclick="convertMarkdown()" title="تحويل الماركداون">
     <i class="bi bi-arrow-left-right"></i>
   </button>
@@ -308,6 +313,39 @@
 <div id="logo-container">
   <img id="logo-image" src="" alt="الشعار" />
   <div id="logo-text"></div>
+</div>
+
+<!-- لوحة تحميل الصور -->
+<div class="offcanvas offcanvas-end" tabindex="-1" id="imagePanel">
+  <div class="offcanvas-header">
+    <h5 class="offcanvas-title">رفع صورة إلى GitHub</h5>
+    <button type="button" class="btn-close text-reset" data-bs-dismiss="offcanvas"></button>
+  </div>
+  <div class="offcanvas-body">
+    <div class="mb-3">
+      <label class="form-label">GitHub PAT:</label>
+      <input type="password" class="form-control" id="github-token" placeholder="Personal Access Token">
+    </div>
+    <div class="mb-3">
+      <label class="form-label">اختيار ملف الصورة:</label>
+      <input type="file" id="image-file" class="form-control" accept="image/*">
+    </div>
+    <div class="mb-3">
+      <label class="form-label">Alt Text:</label>
+      <input type="text" id="image-alt" class="form-control" placeholder="وصف الصورة">
+    </div>
+    <div class="mb-3">
+      <button class="btn btn-success w-100 btn-custom" onclick="handleUpload()">رفع الصورة</button>
+    </div>
+    <div class="mb-3">
+      <label class="form-label">رابط الصورة (raw):</label>
+      <input type="text" id="image-url" class="form-control" readonly>
+    </div>
+    <div class="mb-3">
+      <button class="btn btn-primary w-100 btn-custom" id="insert-btn" onclick="insertImage()" disabled>Insert في الماركداون</button>
+    </div>
+    <div id="upload-status" class="text-center"></div>
+  </div>
 </div>
 
 <!-- Bootstrap JS -->
@@ -586,6 +624,90 @@
     } else {
       window.scrollTo({ top: 0, behavior: 'smooth' });
     }
+  }
+</script>
+
+<!-- سكربت الإضافة الجديدة لتحميل وإدراج الصور -->
+<script>
+  // رفع الصورة إلى GitHub
+  function handleUpload() {
+    const token = document.getElementById('github-token').value.trim();
+    const fileInput = document.getElementById('image-file');
+    const file = fileInput.files[0];
+    const status = document.getElementById('upload-status');
+
+    if (!token) {
+      status.innerHTML = '<span class="text-danger">الرجاء إدخال التوكن.</span>';
+      return;
+    }
+    if (!file) {
+      status.innerHTML = '<span class="text-danger">الرجاء اختيار ملف الصورة.</span>';
+      return;
+    }
+
+    const reader = new FileReader();
+    reader.onloadend = () => {
+      const base64Data = reader.result.split(',')[1];
+      const apiUrl = `https://api.github.com/repos/hhkuy/viatosis-pdf-maker/contents/pic/${file.name}`;
+
+      fetch(apiUrl, {
+        method: 'PUT',
+        headers: {
+          'Authorization': `token ${token}`,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          message: `Add ${file.name}`,
+          content: base64Data,
+          branch: 'main'
+        })
+      })
+      .then(res => res.json())
+      .then(data => {
+        if (data.content && data.content.path) {
+          const rawUrl = `https://raw.githubusercontent.com/hhkuy/viatosis-pdf-maker/main/pic/${file.name}`;
+          document.getElementById('image-url').value = rawUrl;
+          document.getElementById('insert-btn').disabled = false;
+          status.innerHTML = '<span class="text-success">تم الرفع بنجاح!</span>';
+        } else if (data.message && data.message.includes('already exists')) {
+          const rawUrl = `https://raw.githubusercontent.com/hhkuy/viatosis-pdf-maker/main/pic/${file.name}`;
+          document.getElementById('image-url').value = rawUrl;
+          document.getElementById('insert-btn').disabled = false;
+          status.innerHTML = '<span class="text-warning">الملف موجود مسبقاً، تم استخدام الرابط الموجود.</span>';
+        } else {
+          status.innerHTML = '<span class="text-danger">حدث خطأ أثناء الرفع.</span>';
+        }
+      })
+      .catch(() => {
+        status.innerHTML = '<span class="text-danger">فشل الرفع.</span>';
+      });
+    };
+    reader.readAsDataURL(file);
+  }
+
+  // إدراج رابط الصورة مكان مؤشر الكتابة في الماركداون
+  function insertImage() {
+    const url = document.getElementById('image-url').value.trim();
+    const alt = document.getElementById('image-alt').value.trim() || '';
+    if (!url) return;
+
+    const textarea = document.getElementById('markdown-input');
+    const start = textarea.selectionStart;
+    const end = textarea.selectionEnd;
+    const md = `![${alt}](${url})`;
+
+    textarea.value = textarea.value.slice(0, start) + md + textarea.value.slice(end);
+    textarea.focus();
+    textarea.selectionStart = textarea.selectionEnd = start + md.length;
+
+    document.getElementById('insert-btn').disabled = true;
+    document.getElementById('upload-status').innerHTML = '';
+    document.getElementById('image-file').value = '';
+
+    // إغلاق اللوحة الجانبية بعد الإدراج
+    const offcanvasElement = document.getElementById('imagePanel');
+    const offcanvasInstance = bootstrap.Offcanvas.getInstance(offcanvasElement);
+    if (offcanvasInstance) offcanvasInstance.hide();
   }
 </script>
 
