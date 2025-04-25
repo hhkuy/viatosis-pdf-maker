@@ -725,53 +725,56 @@
       return;
     }
 
-    let uploaded = 0;
     status.innerHTML = '<span class="text-info">جاري الرفع...</span>';
+    let uploaded = 0;
+    let startNumber = null;
+
+    getNextImageNumber(num => {
+      startNumber = num;
+      uploadNext();
+    });
 
     function uploadNext() {
       if (uploaded >= files.length) {
-        status.innerHTML = '<span class="text-success">تم رفع جميع الصور بنجاح!</span>';
+        status.innerHTML = '<span class="text-success">تم الرفع!</span>';
         loadGallery();
         return;
       }
       const file = files[uploaded];
-      getNextImageNumber(nextNum => {
-        const ext = file.name.split('.').pop();
-        const newFileName = `${nextNum}.${ext}`;
-        const reader = new FileReader();
-        reader.onloadend = () => {
-          const base64Data = reader.result.split(',')[1];
-          const apiUrl = `https://api.github.com/repos/hhkuy/viatosis-pdf-maker/contents/pic/${newFileName}`;
-          fetch(apiUrl, {
-            method: 'PUT',
-            headers: {
-              'Authorization': `token ${token}`,
-              'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({
-              message: `Add ${newFileName}`,
-              content: base64Data,
-              branch: 'main'
-            })
+      const ext = file.name.split('.').pop();
+      const newFileName = `${startNumber + uploaded}.${ext}`;
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        const base64Data = reader.result.split(',')[1];
+        const apiUrl = `https://api.github.com/repos/hhkuy/viatosis-pdf-maker/contents/pic/${newFileName}`;
+        fetch(apiUrl, {
+          method: 'PUT',
+          headers: {
+            'Authorization': `token ${token}`,
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({
+            message: `Add ${newFileName}`,
+            content: base64Data,
+            branch: 'main'
           })
-          .then(res => res.json())
-          .then(data => {
-            if (data.content && data.content.path) {
-              const rawUrl = `https://raw.githubusercontent.com/hhkuy/viatosis-pdf-maker/main/pic/${newFileName}`;
-              const altText = document.getElementById('image-alt').value.trim() || newFileName.split('.')[0];
-              selectedImages.push({url: rawUrl, alt: altText});
-              uploaded++;
-              uploadNext();
-            } else {
-              status.innerHTML = '<span class="text-danger">حدث خطأ أثناء الرفع.</span>';
-            }
-          })
-          .catch(() => { status.innerHTML = '<span class="text-danger">فشل الرفع.</span>'; });
-        };
-        reader.readAsDataURL(file);
-      });
+        })
+        .then(res => res.json())
+        .then(data => {
+          if (data.content && data.content.path) {
+            const rawUrl = `https://raw.githubusercontent.com/hhkuy/viatosis-pdf-maker/main/pic/${newFileName}`;
+            const altText = document.getElementById('image-alt').value.trim() || newFileName.split('.')[0];
+            selectedImages.push({url: rawUrl, alt: altText});
+            uploaded++;
+            uploadNext();
+          } else {
+            status.innerHTML = '<span class="text-danger">حدث خطأ أثناء الرفع.</span>';
+          }
+        })
+        .catch(() => { status.innerHTML = '<span class="text-danger">فشل الرفع.</span>'; });
+      };
+      reader.readAsDataURL(file);
     }
-    uploadNext();
   }
 
   // تحميل وعرض المعرض
