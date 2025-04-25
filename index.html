@@ -1,3 +1,4 @@
+```html
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
@@ -79,39 +80,29 @@
       position: relative;
     }
 
-    /* ضبط الصور لتتلاءم مع الصفحة + ظل وإطار خفيف + المحافظة على الدقة */
+    /* ضبط الصور + الحفاظ على الدقة */
     #result img {
       display: block;
-      margin: 10px auto;
+      margin: 0 auto;
       box-shadow: 0 2px 8px rgba(0,0,0,0.15);
       border: 2px solid #eee;
       border-radius: 8px;
       height: auto;
       max-width: 100%;
-      object-fit: contain;          /* عدم تشويه الصورة */
-      image-rendering: auto;        /* الحفاظ على الجودة */
+      object-fit: contain;
+      image-rendering: auto;
     }
 
-    /* تنسيق الشبكة للصور المُدرجة مع تحجيم تلقائي يناسب A4/A3 بدون تشويه */
+    /* شبكة الصور بصيغة CSS Grid لضمان محاذاة ثابتة */
     .img-grid {
-      display: flex;
-      flex-wrap: wrap;
+      display: grid;
       gap: 10px;
       justify-content: center;
       page-break-inside: avoid;
     }
-    .img-grid.cols-1 img{
-      flex: 1 1 100%;
-      max-width: 100%;
-    }
-    .img-grid.cols-2 img{
-      flex: 1 1 calc(50% - 10px);
-      max-width: calc(50% - 10px);
-    }
-    .img-grid.cols-3 img{
-      flex: 1 1 calc(33.333% - 10px);
-      max-width: calc(33.333% - 10px);
-    }
+    .img-grid.cols-1 { grid-template-columns: 1fr; }
+    .img-grid.cols-2 { grid-template-columns: repeat(2, 1fr); }
+    .img-grid.cols-3 { grid-template-columns: repeat(3, 1fr); }
 
     /* تنسيقات داخل النتيجة */
     #result h1 { color: #2e4053; }
@@ -149,13 +140,13 @@
         border: 2px solid #eee;
         border-radius: 8px;
         height: auto;
-        max-width: 180mm;         /* ضمان التناسب مع ورقة A4 */
+        max-width: 180mm;
         object-fit: contain;
       }
-      .img-grid { page-break-inside: avoid; }
-      .img-grid.cols-1 img{ max-width: 180mm; }
-      .img-grid.cols-2 img{ max-width: calc(90mm - 10px); }
-      .img-grid.cols-3 img{ max-width: calc(60mm - 10px); }
+      .img-grid { gap: 10px; }
+      .img-grid.cols-1 { grid-template-columns: 1fr; }
+      .img-grid.cols-2 { grid-template-columns: repeat(2, 1fr); }
+      .img-grid.cols-3 { grid-template-columns: repeat(3, 1fr); }
     }
 
     /* الأزرار العائمة */
