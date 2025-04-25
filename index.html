@@ -82,6 +82,14 @@
       position: relative;
     }
 
+    /* ضبط الصور لتتلاءم مع الصفحة */
+    #result img {
+      max-width: 100%;
+      height: auto;
+      display: block;
+      margin: 10px auto;
+    }
+
     /* تنسيقات داخل النتيجة */
     #result h1 { color: #2e4053; }
     #result h2 { color: #2874a6; }
@@ -112,6 +120,7 @@
 
     @media print {
       body { -webkit-print-color-adjust: exact; }
+      #result img { max-width: 180mm; height: auto; } /* ملائمة للطباعة على A4/A3 */
     }
 
     /* الأزرار العائمة */
@@ -200,7 +209,16 @@
   <!-- إدخال الماركداون -->
   <div class="mb-3">
     <label for="markdown-input" class="form-label">أدخل نص الماركداون هنا:</label>
-    <textarea class="form-control" id="markdown-input" placeholder="اكتب نص الماركداون هنا..."></textarea>
+    <textarea class="form-control" id="markdown-input" style="direction:ltr;text-align:left;" placeholder="اكتب نص الماركداون هنا..."></textarea>
+  </div>
+
+  <!-- اتجاه الكتابة في المحرر -->
+  <div class="mb-3">
+    <label for="editor-dir" class="form-label">اتجاه الكتابة في المحرر:</label>
+    <select id="editor-dir" class="form-select" onchange="changeEditorDir()">
+      <option value="ltr" selected>من اليسار إلى اليمين (افتراضي)</option>
+      <option value="rtl">من اليمين إلى اليسار</option>
+    </select>
   </div>
 
   <!-- اختيار الخط -->
@@ -371,6 +389,14 @@
       document.body.style.fontFamily = currentFont;
       document.getElementById('logo-text').style.fontFamily = currentFont;
     }
+  }
+
+  // تغيير اتجاه المحرر
+  function changeEditorDir() {
+    const dir = document.getElementById('editor-dir').value;
+    const textarea = document.getElementById('markdown-input');
+    textarea.style.direction = dir;
+    textarea.style.textAlign = (dir === 'rtl') ? 'right' : 'left';
   }
 
   function detectFirstCharDirection(text) {
@@ -565,6 +591,7 @@
       #printResult table { width:100%; border-collapse:collapse; margin:20px 0; }
       #printResult table th,#printResult table td { border:1px solid #ccc; padding:10px; text-align:left; }
       #printResult table thead { background:#f2f2f2; }
+      #printResult img { max-width:180mm; height:auto; display:block; margin:10px auto; }
       #printWatermarkText,#printWatermarkImage { position:fixed; top:0; left:0; width:100%; height:100%; display:flex; flex-wrap:wrap; justify-content:center; align-items:center; pointer-events:none; z-index:-1; }
     `;
 
