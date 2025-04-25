@@ -45,7 +45,10 @@
       font-weight: 600;
     }
 
-    label { font-weight: 600; color: #555; }
+    label {
+      font-weight: 600;
+      color: #555;
+    }
 
     /* تنسيق خاص للأزرار */
     .btn-custom {
@@ -79,31 +82,6 @@
       position: relative;
     }
 
-    /* ضبط الصور + الحفاظ على الدقة */
-    #result img {
-      display: block;
-      margin: 0 auto 10px;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.15);
-      border: 2px solid #eee;
-      border-radius: 8px;
-      height: auto;
-      max-width: 100%;
-      object-fit: contain;
-      image-rendering: auto;
-    }
-
-    /* شبكة الصور باستخدام Flex لضمان ترتيب صحيح عند A4/A3 */
-    .img-grid{
-      display:flex;
-      flex-wrap:wrap;
-      gap:10px;
-      justify-content:center;
-      page-break-inside: avoid;
-    }
-    .img-grid.cols-1 img{flex:0 0 100%;max-width:100%}
-    .img-grid.cols-2 img{flex:0 0 calc(45% - 10px);max-width:calc(45% - 10px)}
-    .img-grid.cols-3 img{flex:0 0 calc(28% - 10px);max-width:calc(28% - 10px)}
-
     /* تنسيقات داخل النتيجة */
     #result h1 { color: #2e4053; }
     #result h2 { color: #2874a6; }
@@ -133,20 +111,7 @@
     #result table thead { background-color: #f2f2f2; }
 
     @media print {
-      @page { size: A4 portrait; margin: 15mm; }
       body { -webkit-print-color-adjust: exact; }
-      #result img {
-        box-shadow: 0 2px 8px rgba(0,0,0,0.15);
-        border: 2px solid #eee;
-        border-radius: 8px;
-        height: auto;
-        max-width: 170mm;
-        object-fit: contain;
-      }
-      .img-grid{display:flex;flex-wrap:wrap;gap:10px;justify-content:center}
-      .img-grid.cols-1 img{max-width:170mm}
-      .img-grid.cols-2 img{max-width:calc(82mm - 10px)}
-      .img-grid.cols-3 img{max-width:calc(53mm - 10px)}
     }
 
     /* الأزرار العائمة */
@@ -207,21 +172,21 @@
       font-weight: 600;
       font-family: 'Inter', 'Cairo', sans-serif;
     }
-
-    /* معرض الصور */
-    .selectable {cursor:pointer;border:2px solid transparent;border-radius:8px;}
-    .selectable:hover {border-color:#0d6efd;}
-    .selected {border-color:#198754;}
   </style>
 </head>
 <body>
 
 <!-- أزرار عائمة -->
 <div class="floating-buttons">
-  <button class="btn btn-warning btn-custom" data-bs-toggle="offcanvas" data-bs-target="#imagePanel" title="إضافة صورة"><i class="bi bi-image"></i></button>
-  <button class="btn btn-success btn-custom" onclick="convertMarkdown()" title="تحويل"><i class="bi bi-arrow-left-right"></i></button>
-  <button class="btn btn-dark btn-custom" onclick="printResult()" title="طباعة / PDF"><i class="bi bi-printer-fill"></i></button>
-  <button class="btn btn-info btn-custom text-white" onclick="toggleScroll()" title="أعلى/أسفل"><i class="bi bi-arrow-up-down"></i></button>
+  <button class="btn btn-success btn-custom" onclick="convertMarkdown()" title="تحويل الماركداون">
+    <i class="bi bi-arrow-left-right"></i>
+  </button>
+  <button class="btn btn-dark btn-custom" onclick="printResult()" title="طباعة / PDF">
+    <i class="bi bi-printer-fill"></i>
+  </button>
+  <button class="btn btn-info btn-custom text-white" onclick="toggleScroll()" title="أعلى/أسفل">
+    <i class="bi bi-arrow-up-down"></i>
+  </button>
 </div>
 
 <div class="container">
@@ -230,16 +195,7 @@
   <!-- إدخال الماركداون -->
   <div class="mb-3">
     <label for="markdown-input" class="form-label">أدخل نص الماركداون هنا:</label>
-    <textarea class="form-control" id="markdown-input" style="direction:ltr;text-align:left;" placeholder="اكتب نص الماركداون هنا..."></textarea>
-  </div>
-
-  <!-- اتجاه الكتابة في المحرر -->
-  <div class="mb-3">
-    <label for="editor-dir" class="form-label">اتجاه الكتابة في المحرر:</label>
-    <select id="editor-dir" class="form-select" onchange="changeEditorDir()">
-      <option value="ltr" selected>من اليسار إلى اليمين (افتراضي)</option>
-      <option value="rtl">من اليمين إلى اليسار</option>
-    </select>
+    <textarea class="form-control" id="markdown-input" placeholder="اكتب نص الماركداون هنا..."></textarea>
   </div>
 
   <!-- اختيار الخط -->
@@ -315,20 +271,28 @@
   <!-- أزرار التحكم -->
   <div class="row g-2">
     <div class="col-md-4">
-      <button class="btn btn-info w-100 btn-custom text-white" onclick="copyResult()"><i class="bi bi-files"></i> نسخ النتيجة (HTML)</button>
+      <button class="btn btn-info w-100 btn-custom text-white" onclick="copyResult()">
+        <i class="bi bi-files"></i> نسخ النتيجة (HTML)
+      </button>
     </div>
     <div class="col-md-4">
-      <button class="btn btn-danger w-100 btn-custom" onclick="deleteResult()"><i class="bi bi-trash"></i> حذف النتيجة</button>
+      <button class="btn btn-danger w-100 btn-custom" onclick="deleteResult()">
+        <i class="bi bi-trash"></i> حذف النتيجة
+      </button>
     </div>
     <div class="col-md-4">
-      <button class="btn btn-primary w-100 btn-custom" onclick="convertMarkdown()"><i class="bi bi-arrow-left-right"></i> تحويل</button>
+      <button class="btn btn-primary w-100 btn-custom" onclick="convertMarkdown()">
+        <i class="bi bi-arrow-left-right"></i> تحويل
+      </button>
     </div>
   </div>
 
   <!-- زر نسخ كود النتيجة -->
   <div class="row g-2 mt-2">
     <div class="col-md-12">
-      <button class="btn btn-secondary w-100 btn-custom" onclick="copyResultCode()"><i class="bi bi-clipboard"></i> نسخ كود النتيجة</button>
+      <button class="btn btn-secondary w-100 btn-custom" onclick="copyResultCode()">
+        <i class="bi bi-clipboard"></i> نسخ كود النتيجة
+      </button>
     </div>
   </div>
 
@@ -344,54 +308,6 @@
 <div id="logo-container">
   <img id="logo-image" src="" alt="الشعار" />
   <div id="logo-text"></div>
-</div>
-
-<!-- لوحة تحميل الصور -->
-<div class="offcanvas offcanvas-end" tabindex="-1" id="imagePanel">
-  <div class="offcanvas-header">
-    <h5 class="offcanvas-title">رفع صورة إلى GitHub</h5>
-    <button type="button" class="btn-close text-reset" data-bs-dismiss="offcanvas"></button>
-  </div>
-  <div class="offcanvas-body">
-    <div class="mb-3">
-      <label class="form-label">GitHub PAT:</label>
-      <input type="password" class="form-control" id="github-token" placeholder="Personal Access Token">
-    </div>
-    <div class="mb-3">
-      <label class="form-label">اختيار ملفات الصور:</label>
-      <input type="file" id="image-file" class="form-control" accept="image/*" multiple>
-    </div>
-    <div class="mb-3">
-      <label class="form-label">Alt Text موحد (اختياري):</label>
-      <input type="text" id="image-alt" class="form-control" placeholder="وصف الصورة">
-    </div>
-    <div class="mb-3">
-      <button class="btn btn-success w-100 btn-custom" onclick="handleUpload()">رفع الصور</button>
-    </div>
-    <hr>
-    <!-- خيارات الترتيب -->
-    <div class="mb-3">
-      <label class="form-label">كيفية ترتيب الإدراج:</label>
-      <select id="layout-select" class="form-select">
-        <option value="1" selected>صورة تحت صورة</option>
-        <option value="2">صورتان بجانب بعض</option>
-        <option value="3">ثلاث صور بجانب بعض</option>
-      </select>
-    </div>
-    <div class="mb-3">
-      <button class="btn btn-secondary w-100 btn-custom" onclick="loadGallery()">إظهار المعرض</button>
-    </div>
-    <div class="mb-3">
-      <label class="form-label">روابط الصور المختارة:</label>
-      <textarea id="image-url" class="form-control" rows="3" readonly></textarea>
-    </div>
-    <div class="mb-3">
-      <button class="btn btn-primary w-100 btn-custom" id="insert-btn" onclick="insertImage()" disabled>Insert في الماركداون</button>
-    </div>
-    <div id="upload-status" class="text-center"></div>
-    <hr>
-    <div id="gallery" class="mt-3"></div>
-  </div>
 </div>
 
 <!-- Bootstrap JS -->
@@ -417,14 +333,6 @@
       document.body.style.fontFamily = currentFont;
       document.getElementById('logo-text').style.fontFamily = currentFont;
     }
-  }
-
-  // تغيير اتجاه المحرر
-  function changeEditorDir() {
-    const dir = document.getElementById('editor-dir').value;
-    const textarea = document.getElementById('markdown-input');
-    textarea.style.direction = dir;
-    textarea.style.textAlign = (dir === 'rtl') ? 'right' : 'left';
   }
 
   function detectFirstCharDirection(text) {
@@ -473,7 +381,6 @@
 
   function deleteResult() { document.getElementById('result').innerHTML = ""; }
 
-  /* ============   جزء العلامة المائية والشعار  ============ */
   function updateWatermark() {
     // نصية
     const wmText = document.getElementById('watermark-text').value;
@@ -578,7 +485,6 @@
       logoImage.src = '';
     }
   }
-  /* ================================================================ */
 
   function printResult() {
     const content = document.getElementById('result').innerHTML;
@@ -609,11 +515,18 @@
       #printHeader img { width:${logoSize}px; height:auto; border:2px solid #ccc; border-radius:8px; }
       #printHeader div { margin-top:8px; font-size:${doctorSize}px; font-weight:600; }
       #printResult { padding:20px; }
-      #printResult img { max-width:170mm; height:auto; display:block; margin:10px auto; box-shadow:0 2px 8px rgba(0,0,0,0.15); border:2px solid #eee; border-radius:8px; object-fit:contain; }
-      .img-grid {display:flex;flex-wrap:wrap;gap:10px;justify-content:center;}
-      .img-grid.cols-1 img{max-width:170mm;} 
-      .img-grid.cols-2 img{max-width:calc(82mm - 10px);} 
-      .img-grid.cols-3 img{max-width:calc(53mm - 10px);} 
+      #printResult h1 { color:#2e4053; }
+      #printResult h2 { color:#2874a6; }
+      #printResult h3 { color:#148f77; }
+      #printResult h4 { color:#9b59b6; }
+      #printResult h5,#printResult h6 { color:#b03a2e; }
+      #printResult p,#printResult li,#printResult td,#printResult th { color:#2c3e50; }
+      #printResult strong { color:#6c3483; }
+      #printResult em { color:#d35400; }
+      #printResult pre,#printResult code { background:#e8f0fe; padding:4px 8px; border-radius:4px; color:#34495e; }
+      #printResult table { width:100%; border-collapse:collapse; margin:20px 0; }
+      #printResult table th,#printResult table td { border:1px solid #ccc; padding:10px; text-align:left; }
+      #printResult table thead { background:#f2f2f2; }
       #printWatermarkText,#printWatermarkImage { position:fixed; top:0; left:0; width:100%; height:100%; display:flex; flex-wrap:wrap; justify-content:center; align-items:center; pointer-events:none; z-index:-1; }
     `;
 
@@ -673,128 +586,6 @@
     } else {
       window.scrollTo({ top: 0, behavior: 'smooth' });
     }
-  }
-
-  /* ============ تحميل الصور إلى GitHub ============ */
-
-  let selectedImages = [];
-
-  // جلب أكبر رقم للصور
-  function getNextImageNumber(callback) {
-    fetch('https://api.github.com/repos/hhkuy/viatosis-pdf-maker/contents/pic')
-      .then(res => res.json())
-      .then(data => {
-        let max = 0;
-        data.forEach(item => {
-          const m = item.name.match(/^(\d+)\./);
-          if (m) {
-            const num = parseInt(m[1]);
-            if (num > max) max = num;
-          }
-        });
-        callback(max + 1);
-      })
-      .catch(() => callback(Date.now()));
-  }
-
-  // رفع مجموعة صور
-  function handleUpload() {
-    const token = document.getElementById('github-token').value.trim();
-    const fileInput = document.getElementById('image-file');
-    const files = Array.from(fileInput.files);
-    const status = document.getElementById('upload-status');
-
-    if (!token) { status.innerHTML = '<span class="text-danger">الرجاء إدخال التوكن.</span>'; return; }
-    if (files.length === 0) { status.innerHTML = '<span class="text-danger">اختر ملفات صور.</span>'; return; }
-
-    status.innerHTML = '<span class="text-info">جاري الرفع...</span>';
-    let uploaded = 0, startNumber = null;
-
-    getNextImageNumber(num => { startNumber = num; uploadNext(); });
-
-    function uploadNext() {
-      if (uploaded >= files.length){ status.innerHTML = '<span class="text-success">تم الرفع!</span>'; loadGallery(); return; }
-      const file = files[uploaded];
-      const ext = file.name.split('.').pop();
-      const newFileName = `${startNumber + uploaded}.${ext}`;
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        const base64Data = reader.result.split(',')[1];
-        const apiUrl = `https://api.github.com/repos/hhkuy/viatosis-pdf-maker/contents/pic/${newFileName}`;
-        fetch(apiUrl,{
-          method:'PUT',
-          headers:{'Authorization':`token ${token}`,'Content-Type':'application/json'},
-          body:JSON.stringify({message:`Add ${newFileName}`,content:base64Data,branch:'main'})
-        })
-        .then(res=>res.json())
-        .then(data=>{
-          if(data.content&&data.content.path){
-            const rawUrl = `https://raw.githubusercontent.com/hhkuy/viatosis-pdf-maker/main/pic/${newFileName}`;
-            const altText = document.getElementById('image-alt').value.trim() || newFileName.split('.')[0];
-            selectedImages.push({url:rawUrl,alt:altText});
-            uploaded++; uploadNext();
-          } else { status.innerHTML='<span class="text-danger">خطأ أثناء الرفع.</span>'; }
-        })
-        .catch(()=>{ status.innerHTML='<span class="text-danger">فشل الرفع.</span>'; });
-      };
-      reader.readAsDataURL(file);
-    }
-  }
-
-  // معرض الصور
-  function loadGallery() {
-    const gallery = document.getElementById('gallery');
-    gallery.innerHTML = '<p class="text-center text-muted">...جاري التحميل</p>';
-
-    fetch('https://api.github.com/repos/hhkuy/viatosis-pdf-maker/contents/pic')
-      .then(res=>res.json())
-      .then(data=>{
-        let html='<div class="row">';
-        data.forEach(item=>{
-          if(item.type==='file'){
-            const rawUrl=`https://raw.githubusercontent.com/hhkuy/viatosis-pdf-maker/main/pic/${item.name}`;
-            const nameNoExt=item.name.split('.')[0];
-            html+=`
-              <div class="col-6 col-md-4 mb-3 text-center">
-                <img src="${rawUrl}" alt="${nameNoExt}" class="img-fluid selectable" onclick="selectExistingImage(this,'${rawUrl}','${nameNoExt}')">
-                <div class="mt-1"><small>${nameNoExt}</small></div>
-              </div>`;
-          }
-        });
-        html+='</div>'; gallery.innerHTML=html;
-      })
-      .catch(()=>{ gallery.innerHTML='<p class="text-danger text-center">تعذر تحميل المعرض.</p>'; });
-  }
-
-  function selectExistingImage(imgElem,url,alt){
-    imgElem.classList.toggle('selected');
-    if(imgElem.classList.contains('selected')){ selectedImages.push({url,alt}); }
-    else{ selectedImages = selectedImages.filter(i=>i.url!==url); }
-    document.getElementById('insert-btn').disabled = (selectedImages.length===0);
-    document.getElementById('image-url').value = selectedImages.map(i=>i.url).join('\n');
-  }
-
-  // إدراج الصور في المحرر
-  function insertImage(){
-    if(selectedImages.length===0) return;
-    const layout=parseInt(document.getElementById('layout-select').value,10);
-    let htmlSnippet=`<div class="img-grid cols-${layout}">`;
-    selectedImages.forEach(img=>{ htmlSnippet+=`<img src="${img.url}" alt="${img.alt}">`; });
-    htmlSnippet+='</div>';
-
-    const textarea=document.getElementById('markdown-input');
-    const start=textarea.selectionStart,end=textarea.selectionEnd;
-    textarea.value = textarea.value.slice(0,start)+htmlSnippet+textarea.value.slice(end);
-    textarea.focus();
-    textarea.selectionStart = textarea.selectionEnd = start+htmlSnippet.length;
-
-    selectedImages=[]; document.getElementById('insert-btn').disabled=true;
-    document.getElementById('upload-status').innerHTML=''; document.getElementById('image-file').value='';
-    document.getElementById('image-url').value=''; document.querySelectorAll('.selectable').forEach(el=>el.classList.remove('selected'));
-
-    const offcanvasElement=document.getElementById('imagePanel');
-    const offcanvasInstance=bootstrap.Offcanvas.getInstance(offcanvasElement);
-    if(offcanvasInstance) offcanvasInstance.hide();
   }
 </script>
 
