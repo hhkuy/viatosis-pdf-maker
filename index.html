@@ -45,10 +45,7 @@
       font-weight: 600;
     }
 
-    label {
-      font-weight: 600;
-      color: #555;
-    }
+    label { font-weight: 600; color: #555; }
 
     /* تنسيق خاص للأزرار */
     .btn-custom {
@@ -84,20 +81,38 @@
 
     /* ضبط الصور لتتلاءم مع الصفحة + ظل وإطار خفيف */
     #result img {
-      max-width: 100%;
-      height: auto;
       display: block;
       margin: 10px auto;
       box-shadow: 0 2px 8px rgba(0,0,0,0.15);
       border: 2px solid #eee;
       border-radius: 8px;
+      height: auto;
+      max-width: 100%;
     }
 
-    /* تنسيق الشبكة للصور المُدرجة */
-    .img-grid {display:flex;flex-wrap:wrap;gap:10px;justify-content:center;}
-    .img-grid.cols-1 img{flex:1 0 100%;max-width:100%;}
-    .img-grid.cols-2 img{flex:1 0 calc(50% - 10px);max-width:calc(50% - 10px);}  
-    .img-grid.cols-3 img{flex:1 0 calc(33.333% - 10px);max-width:calc(33.333% - 10px);}  
+    /* تنسيق الشبكة للصور المُدرجة مع تحجيم تلقائي يناسب A4/A3 */
+    .img-grid {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      justify-content: center;
+      page-break-inside: avoid;
+    }
+    .img-grid.cols-1 img{
+      flex: 0 0 100%;
+      width: 100%;
+      max-width: 100%;
+    }
+    .img-grid.cols-2 img{
+      flex: 0 0 calc(50% - 10px);
+      width: calc(50% - 10px);
+      max-width: calc(50% - 10px);
+    }
+    .img-grid.cols-3 img{
+      flex: 0 0 calc(33.333% - 10px);
+      width: calc(33.333% - 10px);
+      max-width: calc(33.333% - 10px);
+    }
 
     /* تنسيقات داخل النتيجة */
     #result h1 { color: #2e4053; }
@@ -128,9 +143,13 @@
     #result table thead { background-color: #f2f2f2; }
 
     @media print {
+      @page { size: A4 portrait; margin: 15mm; }
       body { -webkit-print-color-adjust: exact; }
-      #result img { max-width: 180mm; height: auto; box-shadow: 0 2px 8px rgba(0,0,0,0.15); border: 2px solid #eee; border-radius: 8px; }
-      .img-grid {gap:10px;}
+      #result img { box-shadow: 0 2px 8px rgba(0,0,0,0.15); border: 2px solid #eee; border-radius: 8px; }
+      .img-grid { page-break-inside: avoid; }
+      .img-grid.cols-1 img{ width:100%; max-width:100%; }
+      .img-grid.cols-2 img{ width:calc(50% - 10px); max-width:calc(50% - 10px); }
+      .img-grid.cols-3 img{ width:calc(33.333% - 10px); max-width:calc(33.333% - 10px); }
     }
 
     /* الأزرار العائمة */
