@@ -88,6 +88,9 @@
       height: auto;
       display: block;
       margin: 10px auto;
+      border: 1px solid #ddd;
+      border-radius: 8px;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.15);
     }
 
     /* تنسيقات داخل النتيجة */
@@ -120,7 +123,7 @@
 
     @media print {
       body { -webkit-print-color-adjust: exact; }
-      #result img { max-width: 180mm; height: auto; }
+      #result img { max-width: 180mm; height: auto; border: 1px solid #ddd; border-radius: 8px; box-shadow: 0 2px 6px rgba(0,0,0,0.15); }
     }
 
     /* الأزرار العائمة */
@@ -183,7 +186,7 @@
     }
 
     /* معرض الصور */
-    .selectable {cursor:pointer;border:2px solid transparent;border-radius:8px;}
+    .selectable {cursor:pointer;border:2px solid transparent;border-radius:8px;transition:0.2s;}
     .selectable:hover {border-color:#0d6efd;}
     .selected {border-color:#198754;}
   </style>
@@ -350,15 +353,23 @@
       <input type="password" class="form-control" id="github-token" placeholder="Personal Access Token">
     </div>
     <div class="mb-3">
-      <label class="form-label">اختيار ملف الصورة:</label>
-      <input type="file" id="image-file" class="form-control" accept="image/*">
+      <label class="form-label">اختيار ملف/ملفات الصورة:</label>
+      <input type="file" id="image-file" class="form-control" accept="image/*" multiple>
     </div>
     <div class="mb-3">
-      <label class="form-label">Alt Text:</label>
+      <label class="form-label">Alt Text (يطبق على جميع الصور المرفوعة):</label>
       <input type="text" id="image-alt" class="form-control" placeholder="وصف الصورة">
     </div>
     <div class="mb-3">
-      <button class="btn btn-success w-100 btn-custom" onclick="handleUpload()">رفع الصورة</button>
+      <label class="form-label">طريقة ترتيب الصور عند الإدراج:</label>
+      <select id="image-layout" class="form-select">
+        <option value="stack" selected>صورة تحت صورة</option>
+        <option value="row-2">صورتان بجانب بعض</option>
+        <option value="row-3">ثلاث صور بجانب بعض</option>
+      </select>
+    </div>
+    <div class="mb-3">
+      <button class="btn btn-success w-100 btn-custom" onclick="handleUpload()">رفع الصورة/الصور</button>
     </div>
     <div class="mb-3">
       <button class="btn btn-secondary w-100 btn-custom" onclick="loadGallery()">إظهار المعرض</button>
@@ -368,7 +379,7 @@
       <input type="text" id="image-url" class="form-control" readonly>
     </div>
     <div class="mb-3">
-      <button class="btn btn-primary w-100 btn-custom" id="insert-btn" onclick="insertImage()" disabled>Insert في الماركداون</button>
+      <button class="btn btn-primary w-100 btn-custom" id="insert-btn" onclick="insertImage()" disabled>Insert الصور في الماركداون</button>
     </div>
     <div id="upload-status" class="text-center"></div>
     <hr>
@@ -603,7 +614,7 @@
       #printResult table { width:100%; border-collapse:collapse; margin:20px 0; }
       #printResult table th,#printResult table td { border:1px solid #ccc; padding:10px; text-align:left; }
       #printResult table thead { background:#f2f2f2; }
-      #printResult img { max-width:180mm; height:auto; display:block; margin:10px auto; }
+      #printResult img { max-width:180mm; height:auto; display:block; margin:10px auto; border:1px solid #ddd; border-radius:8px; box-shadow:0 2px 6px rgba(0,0,0,0.15); }
       #printWatermarkText,#printWatermarkImage { position:fixed; top:0; left:0; width:100%; height:100%; display:flex; flex-wrap:wrap; justify-content:center; align-items:center; pointer-events:none; z-index:-1; }
     `;
 
@@ -685,31 +696,20 @@
       .catch(() => callback(Date.now())); // في حال فشل الجلب
   }
 
-  // رفع الصورة إلى GitHub مع إعادة تسمية رقمية
-  function handleUpload() {
-    const token = document.getElementById('github-token').value.trim();
-    const fileInput = document.getElementById('image-file');
-    const file = fileInput.files[0];
-    const status = document.getElementById('upload-status');
-
-    if (!token) {
-      status.innerHTML = '<span class="text-danger">الرجاء إدخال التوكن.</span>';
+  // رفع مجموعة من الملفات بشكل تسلسلي
+  function uploadFilesSequential(files, token, altText, index, collectedUrls, onComplete) {
+    if (index >= files.length) {
+      onComplete(collectedUrls);
       return;
     }
-    if (!file) {
-      status.innerHTML = '<span class="text-danger">الرجاء اختيار ملف الصورة.</span>';
-      return;
-    }
-
+    const file = files[index];
     getNextImageNumber(nextNum => {
       const ext = file.name.split('.').pop();
       const newFileName = `${nextNum}.${ext}`;
-
       const reader = new FileReader();
       reader.onloadend = () => {
         const base64Data = reader.result.split(',')[1];
         const apiUrl = `https://api.github.com/repos/hhkuy/viatosis-pdf-maker/contents/pic/${newFileName}`;
-
         fetch(apiUrl, {
           method: 'PUT',
           headers: {
@@ -726,19 +726,45 @@
         .then(data => {
           if (data.content && data.content.path) {
             const rawUrl = `https://raw.githubusercontent.com/hhkuy/viatosis-pdf-maker/main/pic/${newFileName}`;
-            document.getElementById('image-url').value = rawUrl;
-            document.getElementById('insert-btn').disabled = false;
-            status.innerHTML = '<span class="text-success">تم الرفع بنجاح!</span>';
-            loadGallery(); // تحديث المعرض مباشرة
+            collectedUrls.push(rawUrl);
+            document.getElementById('upload-status').innerHTML = `<span class="text-success">تم رفع ${index+1} / ${files.length}</span>`;
+            // تحميل المعرض بعد آخر صورة
+            if (index === files.length - 1) loadGallery();
+            uploadFilesSequential(files, token, altText, index + 1, collectedUrls, onComplete);
           } else {
-            status.innerHTML = '<span class="text-danger">حدث خطأ أثناء الرفع.</span>';
+            document.getElementById('upload-status').innerHTML = '<span class="text-danger">حدث خطأ أثناء الرفع.</span>';
           }
         })
         .catch(() => {
-          status.innerHTML = '<span class="text-danger">فشل الرفع.</span>';
+          document.getElementById('upload-status').innerHTML = '<span class="text-danger">فشل الرفع.</span>';
         });
       };
       reader.readAsDataURL(file);
+    });
+  }
+
+  // رفع الصورة/الصور إلى GitHub
+  function handleUpload() {
+    const token = document.getElementById('github-token').value.trim();
+    const fileInput = document.getElementById('image-file');
+    const files = Array.from(fileInput.files);
+    const status = document.getElementById('upload-status');
+
+    if (!token) {
+      status.innerHTML = '<span class="text-danger">الرجاء إدخال التوكن.</span>';
+      return;
+    }
+    if (!files.length) {
+      status.innerHTML = '<span class="text-danger">الرجاء اختيار ملف/ملفات الصورة.</span>';
+      return;
+    }
+
+    uploadFilesSequential(files, token, document.getElementById('image-alt').value.trim(), 0, [], urls => {
+      // بعد رفع كل الصور بنجاح
+      document.getElementById('insert-btn').disabled = false;
+      // حفظ أول رابط فقط في الحقل النصي لأغراض التوافق القديم
+      if (urls.length) document.getElementById('image-url').value = urls[0];
+      status.innerHTML = '<span class="text-success">تم رفع جميع الصور بنجاح!</span>';
     });
   }
 
@@ -757,7 +783,7 @@
             const nameNoExt = item.name.split('.')[0];
             html += `
               <div class="col-6 col-md-4 mb-3 text-center">
-                <img src="${rawUrl}" alt="${nameNoExt}" class="img-fluid selectable" onclick="selectExistingImage(this,'${rawUrl}','${nameNoExt}')">
+                <img src="${rawUrl}" alt="${nameNoExt}" class="img-fluid selectable" data-url="${rawUrl}" onclick="selectExistingImage(this)">
                 <div class="mt-1"><small>${nameNoExt}</small></div>
               </div>
             `;
@@ -771,31 +797,60 @@
       });
   }
 
-  // تحديد صورة من المعرض
-  function selectExistingImage(imgElem, url, alt) {
-    document.querySelectorAll('.selectable').forEach(el => el.classList.remove('selected'));
-    imgElem.classList.add('selected');
-    document.getElementById('image-url').value = url;
-    document.getElementById('image-alt').value = alt;
-    document.getElementById('insert-btn').disabled = false;
+  // تحديد/إلغاء تحديد صورة من المعرض
+  function selectExistingImage(imgElem) {
+    imgElem.classList.toggle('selected');
+    updateInsertButton();
   }
 
-  // إدراج رابط الصورة في الماركداون
-  function insertImage() {
-    const url = document.getElementById('image-url').value.trim();
-    const alt = document.getElementById('image-alt').value.trim() || '';
-    if (!url) return;
+  function updateInsertButton() {
+    const anySelected = document.querySelectorAll('#gallery .selected').length > 0;
+    document.getElementById('insert-btn').disabled = !anySelected;
+  }
 
+  // إدراج الصور في الماركداون بحسب التخطيط
+  function insertImage() {
+    const layout = document.getElementById('image-layout').value;
     const textarea = document.getElementById('markdown-input');
     const start = textarea.selectionStart;
     const end = textarea.selectionEnd;
-    const md = `![${alt}](${url})`;
+
+    // تجميع الروابط المختارة
+    let urls = [];
+    document.querySelectorAll('#gallery .selected').forEach(el => urls.push(el.getAttribute('data-url')));
+
+    // في حال عدم وجود تحديد من المعرض، استخدم الرابط الفردي
+    if (!urls.length) {
+      const singleUrl = document.getElementById('image-url').value.trim();
+      if (!singleUrl) return;
+      urls.push(singleUrl);
+    }
+
+    // نص alt موحّد (يمكن تعديله لاحقاً يدويًا)
+    const alt = document.getElementById('image-alt').value.trim() || '';
+
+    let md = '';
+    if (layout === 'stack') {
+      urls.forEach(u => md += `![${alt}](${u})\n\n`);
+    } else {
+      const perRow = (layout === 'row-2') ? 2 : 3;
+      for (let i = 0; i < urls.length; i += perRow) {
+        const slice = urls.slice(i, i + perRow);
+        md += '<div style="display:flex;gap:10px;justify-content:center;">\n';
+        slice.forEach(u => {
+          md += `  <img src="${u}" alt="${alt}" style="flex:1 1 0;max-width:100%;height:auto;border:1px solid #ddd;border-radius:8px;box-shadow:0 2px 6px rgba(0,0,0,0.15);" />\n`;
+        });
+        md += '</div>\n\n';
+      }
+    }
 
     textarea.value = textarea.value.slice(0, start) + md + textarea.value.slice(end);
     textarea.focus();
     textarea.selectionStart = textarea.selectionEnd = start + md.length;
 
-    document.getElementById('insert-btn').disabled = true;
+    // إعادة تعيين الاختيارات
+    document.querySelectorAll('#gallery .selected').forEach(el => el.classList.remove('selected'));
+    updateInsertButton();
     document.getElementById('upload-status').innerHTML = '';
     document.getElementById('image-file').value = '';
 
